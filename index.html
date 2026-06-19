@@ -206,6 +206,396 @@
     const statusLabels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
     list.innerHTML = filtered.map(g => `
       <div class="card">
+        ${g.cover ? `<a class="card-cover" href="${escAttr(g.steamUrl || '#')}" target="_blank" rel="noopener"><img src="${escAttr(g.cover)}" alt="" loading="lazy" onerror="this.closest('.card-cover').style.display='none'"></a>` : ""}
+        <div class="card-body">
+          <div class="card-top">
+            <div class="card-title">${escHtml(g.title)}</div>
+            <span class="badge badge-${g.status}">${statusLabels[g.status] || g.status}</span>
+          </div>
+          <div class="card-meta">${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}</div>
+        </div>
+        <div class="card-footer">
+          <button class="vote-btn ${voted[g.id] ? 'voted' : ''}" onclick="vote('${escAttr(g.id)}')" ${voted[g.id] ? 'disabled' : ''}>
+            🌸 <span class="count">${g.votes}</span>
+            <span class="vote-label">${voted[g.id] ? 'Gevoted!' : 'Upvote'}</span>
+          </button>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function updateStats() {
+    document.getElementById("count-wished").textContent = games.filter(g => g.status === "wished").length;
+    document.getElementById("count-planned").textContent = games.filter(g => g.status === "planned").length;
+    document.getElementById("count-played").textContent = games.filter(g => g.status === "played").length;
+    ["wished","planned","played"].forEach(s => document.getElementById("stat-"+s).classList.toggle("active", filterStatus === s));
+  }
+
+  function toggleStatusFilter(s) { filterStatus = filterStatus === s ? "all" : s; render(); }
+  function setGenre(g) { filterGenre = g; document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.textContent === g)); render(); }
+  function setSort(v) { sortBy = v; render(); }
+
+  async function vote(id) {
+    if (voted[id]) return;
+    voted[id] = true;
+    localStorage.setItem("voted", JSON.stringify(voted));
+    games = games.map(g => g.id === id ? { ...g, votes: g.votes + 1 } : g);
+    render();
+    showToast("🦕 Upvote gezählt!");
+    try { await api({ action: "vote", id }); } catch(e) {}
+  }
+
+  // ---- Suche / Autocomplete ----
+  function extractAppId(url) {
+    const m = String(url).match(/app\/(\d+)/);
+    if (m) return m[1];
+    const t = String(url).trim();
+    if (/^\d{3,}$/.test(t)) return t;
+    return null;
+  }
+
+  function onSearchInput() {
+    const val = document.getElementById("input-search").value.trim();
+    // Sieht aus wie ein Link/Nummer? Dann direkt laden statt Autocomplete.
+    if (val.match(/store\.steampowered|app\/\d+/) || /^\d{3,}$/.test(val)) {
+      hideSuggestions();
+      loadFromSearch();
+      return;
+    }
+    clearTimeout(searchTimer);
+    if (val.length < 2) { hideSuggestions(); return; }
+    searchTimer = setTimeout(() => doSearch(val), 350);
+  }
+
+  async function doSearch(term) {
+    const box = document.getElementById("search-suggestions");
+    box.innerHTML = '<div class="sugg-msg">Suche... 🦕</div>';
+    box.style.display = "block";
+    try {
+      const data = await api({ action: "steamSearch", term });
+      if (data.ok && data.results && data.results.length) {
+        lastResults = data.results;
+        box.innerHTML = data.results.map((r,i) =>
+          `<div class="sugg" onclick="pickSuggestion(${i})">
+            ${r.image ? `<img src="${escAttr(r.image)}" alt="">` : ''}
+            <span>${escHtml(r.name)}</span>
+          </div>`).join("");
+      } else {
+        box.innerHTML = '<div class="sugg-msg">Nichts gefunden — Titel unten manuell eingeben</div>';
+      }
+    } catch(e) {
+      hideSuggestions();
+    }
+  }
+
+  function hideSuggestions() { document.getElementById("search-suggestions").style.display = "none"; }
+
+  // Cover-Adresse direkt aus der Steam-App-ID bauen (zuverlaessig, ohne zickige API)
+  function coverFromAppId(appId) {
+    return "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/header.jpg";
+  }
+
+  function setSteamGame(appId, name) {
+    pendingCover = coverFromAppId(appId);
+    pendingSteamUrl = "https://store.steampowered.com/app/" + appId + "/";
+    if (name) document.getElementById("input-title").value = name;
+    const prev = document.getElementById("steam-preview");
+    prev.innerHTML = '<img src="' + escAttr(pendingCover) + '" alt="" onerror="this.parentNode.style.display=\'none\'">';
+    prev.style.display = "block";
+    const status = document.getElementById("steam-status");
+    status.className = "steam-status ok";
+    status.textContent = name ? ("✓ " + name) : "✓ Cover geladen — bitte Titel pruefen";
+    // Best-effort: Genre (und Titel falls leer) aus den Steam-Details holen, falls Steam mitspielt
+    enhanceFromDetails(appId, !name);
+  }
+
+  async function enhanceFromDetails(appId, fillTitle) {
+    try {
+      const data = await api({ action: "steamInfo", appId });
+      if (data && data.ok) {
+        if (fillTitle && data.title) document.getElementById("input-title").value = data.title;
+        if (data.genre) {
+          const sel = document.getElementById("input-genre");
+          let found = false;
+          for (const opt of sel.options) { if (opt.value === data.genre) { found = true; break; } }
+          if (!found) { const o = document.createElement("option"); o.value = data.genre; o.textContent = data.genre; sel.appendChild(o); }
+          sel.value = data.genre;
+        }
+      }
+    } catch(e) { /* egal - Cover und Titel sind schon da */ }
+  }
+
+  async function pickSuggestion(i) {
+    const r = lastResults[i];
+    if (!r) return;
+    hideSuggestions();
+    document.getElementById("input-search").value = r.name;
+    setSteamGame(r.id, r.name);
+  }
+
+  function loadFromSearch() {
+    const appId = extractAppId(document.getElementById("input-search").value);
+    if (appId) setSteamGame(appId, null);
+  }
+
+  function openModal() {
+    document.getElementById("input-search").value = "";
+    document.getElementById("input-title").value = "";
+    document.getElementById("input-genre").value = "Action";
+    const status = document.getElementById("steam-status");
+    status.textContent = ""; status.className = "steam-status";
+    const prev = document.getElementById("steam-preview");
+    prev.style.display = "none"; prev.innerHTML = "";
+    hideSuggestions();
+    pendingCover = ""; pendingSteamUrl = ""; lastResults = [];
+    document.getElementById("modal-overlay").classList.add("open");
+  }
+  function closeModal() { document.getElementById("modal-overlay").classList.remove("open"); }
+  function handleOverlayClick(e) { if (e.target === e.currentTarget) closeModal(); }
+
+  async function submitGame() {
+    const title = document.getElementById("input-title").value.trim();
+    if (!title) { showToast("❌ Bitte einen Titel angeben"); return; }
+    const btn = document.getElementById("submit-btn");
+    btn.textContent = "Wird eingetragen... 🦕";
+    btn.disabled = true;
+    try {
+      const genre = document.getElementById("input-genre").value;
+      const data = await api({ action: "addGame", title, genre, cover: pendingCover, steamUrl: pendingSteamUrl });
+      if (data.ok) { closeModal(); showToast("🎀 Spiel vorgeschlagen!"); await loadGames(); }
+    } catch(e) {
+      showToast("❌ Fehler beim Eintragen");
+    } finally {
+      btn.textContent = "Vorschlagen 🦕";
+      btn.disabled = false;
+    }
+  }
+
+  function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function escAttr(str) { return String(str).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2500);
+  }
+
+  document.getElementById("input-search").addEventListener("paste", () => setTimeout(() => {
+    const v = document.getElementById("input-search").value.trim();
+    if (extractAppId(v)) { hideSuggestions(); loadFromSearch(); }
+  }, 150));
+
+  loadGames();
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JollyJacky – Game Wishlist 🦕</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { min-height: 100vh; background: linear-gradient(160deg, #fff0f5 0%, #fce4ec 40%, #f3e5f5 100%); font-family: 'Segoe UI', system-ui, sans-serif; color: #4a1942; }
+    header { text-align: center; padding: 28px 20px 16px; border-bottom: 2px dashed #f48fb1; }
+    header .sub { font-size: 13px; font-weight: 700; color: #f06292; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
+    header h1 { font-size: 28px; font-weight: 900; color: #c2185b; }
+    header p { font-size: 13px; color: #e91e6399; margin-top: 6px; }
+
+    .stats { display: flex; margin: 14px 16px 0; gap: 8px; }
+    .stat { flex: 1; text-align: center; background: #fff; border: 2px solid #fce4ec; border-radius: 14px; padding: 10px 4px; cursor: pointer; transition: all 0.15s; }
+    .stat.active { background: #f8bbd0; border-color: #f48fb1; }
+    .stat .icon { font-size: 18px; }
+    .stat .num { font-size: 20px; font-weight: 900; color: #c2185b; }
+    .stat .label { font-size: 10px; color: #ad1457; font-weight: 600; }
+
+    .controls { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
+    .genres { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip { padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; transition: all 0.15s; }
+    .chip.active { background: #f48fb1; border-color: #e91e63; color: #fff; }
+
+    .sort-row { display: flex; align-items: center; gap: 8px; }
+    .sort-row span { font-size: 12px; color: #ad1457; font-weight: 600; white-space: nowrap; }
+    select { background: #fff; border: 2px solid #f8bbd0; color: #c2185b; border-radius: 10px; padding: 5px 10px; font-size: 13px; font-weight: 600; flex: 1; font-family: inherit; }
+
+    .add-btn { margin: 12px 16px 0; width: calc(100% - 32px); background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px #f4849055; }
+
+    .game-list { padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 10px; }
+    .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; }
+    .card-cover { display: block; width: 100%; aspect-ratio: 460 / 215; overflow: hidden; background: #fce4ec; }
+    .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-body { padding: 14px 14px 10px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+    .card-title { font-size: 15px; font-weight: 800; color: #880e4f; line-height: 1.2; flex: 1; }
+    .badge { font-size: 11px; font-weight: 700; border-radius: 8px; padding: 3px 8px; white-space: nowrap; }
+    .badge-wished { background: #fce4ec; color: #c2185b; border: 1.5px solid #f48fb1; }
+    .badge-planned { background: #fce4ec; color: #7b1fa2; border: 1.5px solid #ce93d8; }
+    .badge-played { background: #ede7f6; color: #4a148c; border: 1.5px solid #b39ddb; }
+    .card-meta { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+    .genre-badge { font-size: 11px; background: #fce4ec; color: #ad1457; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec; }
+    .vote-btn { display: flex; align-items: center; gap: 7px; background: #fff; border: 2px solid #f8bbd0; color: #e91e63; border-radius: 12px; padding: 7px 16px; cursor: pointer; font-weight: 800; font-size: 14px; transition: all 0.15s; }
+    .vote-btn.voted { background: linear-gradient(135deg, #f48fb1, #ce93d8); border-color: #f06292; color: #fff; }
+    .vote-btn .count { font-size: 18px; color: #c2185b; }
+    .vote-btn.voted .count { color: #fff; }
+    .vote-btn .vote-label { font-size: 12px; opacity: 0.85; }
+
+    .empty { text-align: center; padding: 60px 20px; color: #f48fb1; }
+    .empty .dino { font-size: 40px; }
+    .empty p { font-weight: 700; margin-top: 8px; }
+    .loading { text-align: center; padding: 60px 20px; color: #f48fb1; font-weight: 700; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(194,24,91,0.15); backdrop-filter: blur(4px); align-items: flex-end; z-index: 100; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff9fb; border-radius: 20px 20px 0 0; padding: 24px 20px 44px; width: 100%; max-width: 480px; margin: 0 auto; border-top: 3px solid #f48fb1; max-height: 92vh; overflow-y: auto; }
+    .modal h2 { font-size: 20px; font-weight: 900; color: #c2185b; margin-bottom: 16px; }
+    .modal label { font-size: 12px; font-weight: 700; color: #ad1457; display: block; margin-bottom: 5px; }
+    .modal input, .modal select { width: 100%; border: 2px solid #f8bbd0; border-radius: 12px; padding: 12px; font-size: 14px; color: #880e4f; background: #fff; margin-bottom: 10px; outline: none; font-family: inherit; }
+
+    .search-wrap { position: relative; }
+    .search-suggestions { display: none; position: absolute; top: calc(100% - 6px); left: 0; right: 0; background: #fff; border: 2px solid #f8bbd0; border-radius: 12px; max-height: 260px; overflow-y: auto; z-index: 10; box-shadow: 0 6px 20px #f4849033; }
+    .sugg { display: flex; align-items: center; gap: 10px; padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #fce4ec; }
+    .sugg:last-child { border-bottom: none; }
+    .sugg:active, .sugg:hover { background: #fce4ec; }
+    .sugg img { width: 54px; height: 25px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: #fce4ec; }
+    .sugg span { font-size: 13px; font-weight: 600; color: #880e4f; }
+    .sugg-msg { padding: 12px; font-size: 13px; color: #ad1457; font-weight: 600; text-align: center; }
+
+    .steam-status { font-size: 12px; font-weight: 700; margin: 0 0 10px; min-height: 16px; }
+    .steam-status.ok { color: #2e7d32; }
+    .steam-status.error { color: #c62828; }
+    .steam-preview { display: none; margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 2px solid #f8bbd0; }
+    .steam-preview img { width: 100%; display: block; }
+    .divider { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; color: #f48fb1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 2px; background: #fce4ec; border-radius: 2px; }
+
+    .modal-submit { width: 100%; background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 4px; }
+    .modal-cancel { width: 100%; background: none; border: none; color: #f48fb1; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 8px; padding: 8px; }
+
+    .toast { display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; padding: 11px 24px; border-radius: 24px; font-weight: 800; font-size: 14px; z-index: 200; box-shadow: 0 4px 20px #f4849055; white-space: nowrap; }
+    .toast.show { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="sub">JollyJacky</div>
+  <h1>Game Wishlist 🦕</h1>
+  <p>Was soll Jacky als nächstes zocken? 🎀</p>
+</header>
+
+<div class="stats">
+  <div class="stat" id="stat-wished" onclick="toggleStatusFilter('wished')"><div class="icon">🌸</div><div class="num" id="count-wished">0</div><div class="label">Gewünscht</div></div>
+  <div class="stat" id="stat-planned" onclick="toggleStatusFilter('planned')"><div class="icon">💜</div><div class="num" id="count-planned">0</div><div class="label">Geplant</div></div>
+  <div class="stat" id="stat-played" onclick="toggleStatusFilter('played')"><div class="icon">✅</div><div class="num" id="count-played">0</div><div class="label">Gespielt</div></div>
+</div>
+
+<div class="controls">
+  <div class="genres" id="genre-filters"></div>
+  <div class="sort-row">
+    <span>Sortierung:</span>
+    <select onchange="setSort(this.value)">
+      <option value="votes">Meiste Votes</option>
+      <option value="newest">Neueste zuerst</option>
+      <option value="alpha">A–Z</option>
+    </select>
+  </div>
+</div>
+
+<button class="add-btn" onclick="openModal()">🎀 Spiel vorschlagen</button>
+
+<div class="game-list" id="game-list"><div class="loading">🦕 Lade Wunschliste...</div></div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <h2>🎀 Spiel vorschlagen</h2>
+
+    <label>Spiel suchen oder Steam-Link einfügen 🎮</label>
+    <div class="search-wrap">
+      <input type="text" id="input-search" placeholder="z.B. Baldur's Gate ..." autocomplete="off"
+        oninput="onSearchInput()" onblur="setTimeout(hideSuggestions, 200)" />
+      <div class="search-suggestions" id="search-suggestions"></div>
+    </div>
+    <div class="steam-status" id="steam-status"></div>
+    <div class="steam-preview" id="steam-preview"></div>
+
+    <div class="divider">Titel &amp; Genre</div>
+
+    <label>Spieltitel *</label>
+    <input type="text" id="input-title" placeholder="Wird automatisch ausgefüllt" />
+    <label>Genre</label>
+    <select id="input-genre">
+      <option>Action</option><option>Adventure</option><option>RPG</option>
+      <option>Strategy</option><option>Simulation</option><option>Indie</option>
+      <option>Horror</option><option>Survival</option><option>Casual</option>
+      <option>Sonstiges</option>
+    </select>
+
+    <button class="modal-submit" id="submit-btn" onclick="submitGame()">Vorschlagen 🦕</button>
+    <button class="modal-cancel" onclick="closeModal()">Abbrechen</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5bJuYmzrBdZqvDLF5x6Xym6MchIpVFtwrHjbBI0PIHdbuq1hOVM_jcXRy1zkCW7OW/exec";
+
+  let games = [];
+  let voted = JSON.parse(localStorage.getItem("voted") || "{}");
+  let filterStatus = "all";
+  let filterGenre = "Alle";
+  let sortBy = "votes";
+  let pendingCover = "";
+  let pendingSteamUrl = "";
+  let searchTimer = null;
+  let lastResults = [];
+
+  async function api(params) {
+    const url = SCRIPT_URL + "?" + new URLSearchParams(params).toString();
+    const res = await fetch(url);
+    return res.json();
+  }
+
+  async function loadGames() {
+    try {
+      const data = await api({ action: "getGames" });
+      if (data.ok) {
+        games = data.games.map(g => ({ ...g, votes: Number(g.votes), id: String(g.id) }));
+        buildGenreFilters();
+        render();
+      }
+    } catch(e) {
+      document.getElementById("game-list").innerHTML = '<div class="empty"><div class="dino">😕</div><p>Verbindungsfehler</p></div>';
+    }
+  }
+
+  function buildGenreFilters() {
+    const genres = ["Alle", ...new Set(games.map(g => g.genre).filter(Boolean))].sort((a,b) => a === "Alle" ? -1 : b === "Alle" ? 1 : a.localeCompare(b));
+    const container = document.getElementById("genre-filters");
+    container.innerHTML = genres.map(g => `<button class="chip ${g === filterGenre ? 'active' : ''}" onclick="setGenre('${escAttr(g)}')">${escHtml(g)}</button>`).join("");
+  }
+
+  function render() {
+    updateStats();
+    const list = document.getElementById("game-list");
+    let filtered = games
+      .filter(g => filterStatus === "all" || g.status === filterStatus)
+      .filter(g => filterGenre === "Alle" || g.genre === filterGenre)
+      .sort((a, b) => {
+        if (sortBy === "votes") return b.votes - a.votes;
+        if (sortBy === "newest") return String(b.id).localeCompare(String(a.id));
+        return a.title.localeCompare(b.title);
+      });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty"><div class="dino">🦕</div><p>${games.length === 0 ? "Noch keine Wünsche — sei der Erste!" : "Nichts gefunden"}</p></div>`;
+      return;
+    }
+
+    const statusLabels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
+    list.innerHTML = filtered.map(g => `
+      <div class="card">
         ${g.cover ? `<a class="card-cover" href="${escAttr(g.steamUrl || '#')}" target="_blank" rel="noopener"><img src="${escAttr(g.cover)}" alt="" loading="lazy"></a>` : ""}
         <div class="card-body">
           <div class="card-top">
