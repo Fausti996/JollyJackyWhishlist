@@ -34,6 +34,9 @@
     .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; }
     .card-cover { display: block; width: 100%; aspect-ratio: 460 / 215; overflow: hidden; background: #fce4ec; }
     .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-cover.ph { display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fce4ec, #f3e5f5); }
+    .ph-dino { font-size: 38px; opacity: 0.65; }
+    .steam-preview.ph { display: flex; align-items: center; justify-content: center; min-height: 90px; background: linear-gradient(135deg, #fce4ec, #f3e5f5); }
     .card-body { padding: 14px 14px 10px; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card-title { font-size: 15px; font-weight: 800; color: #880e4f; line-height: 1.2; flex: 1; }
@@ -206,7 +209,9 @@
     const statusLabels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
     list.innerHTML = filtered.map(g => `
       <div class="card">
-        ${g.cover ? `<a class="card-cover" href="${escAttr(g.steamUrl || '#')}" target="_blank" rel="noopener"><img src="${escAttr(g.cover)}" alt="" loading="lazy" onerror="this.closest('.card-cover').style.display='none'"></a>` : ""}
+        ${g.steamUrl
+          ? `<a class="card-cover${g.cover ? '' : ' ph'}" href="${escAttr(g.steamUrl)}" target="_blank" rel="noopener">${g.cover ? `<img src="${escAttr(g.cover)}" alt="" loading="lazy" onerror="coverFallback(this)">` : `<span class="ph-dino">🦕</span>`}</a>`
+          : `<div class="card-cover${g.cover ? '' : ' ph'}">${g.cover ? `<img src="${escAttr(g.cover)}" alt="" loading="lazy" onerror="coverFallback(this)">` : `<span class="ph-dino">🦕</span>`}</div>`}
         <div class="card-body">
           <div class="card-top">
             <div class="card-title">${escHtml(g.title)}</div>
@@ -290,23 +295,37 @@
 
   function hideSuggestions() { document.getElementById("search-suggestions").style.display = "none"; }
 
-  // Cover-Adresse direkt aus der Steam-App-ID bauen (zuverlaessig, ohne zickige API)
-  function coverFromAppId(appId) {
+  // Cover-Adresse aus dem (funktionierenden) Such-Bild ableiten; sonst aus der App-ID bauen
+  function coverFromTiny(tiny, appId) {
+    if (tiny) {
+      const base = String(tiny).split("?")[0];
+      if (/\/[^\/]+\.jpg$/i.test(base)) return base.replace(/\/[^\/]+\.jpg$/i, "/header.jpg");
+    }
     return "https://cdn.cloudflare.steamstatic.com/steam/apps/" + appId + "/header.jpg";
   }
 
-  function setSteamGame(appId, name) {
-    pendingCover = coverFromAppId(appId);
+  function setSteamGame(appId, name, tiny) {
+    pendingCover = coverFromTiny(tiny, appId);
     pendingSteamUrl = "https://store.steampowered.com/app/" + appId + "/";
     if (name) document.getElementById("input-title").value = name;
     const prev = document.getElementById("steam-preview");
-    prev.innerHTML = '<img src="' + escAttr(pendingCover) + '" alt="" onerror="this.parentNode.style.display=\'none\'">';
+    prev.className = "steam-preview";
+    prev.innerHTML = '<img src="' + escAttr(pendingCover) + '" alt="" onerror="previewFallback(this)">';
     prev.style.display = "block";
     const status = document.getElementById("steam-status");
     status.className = "steam-status ok";
     status.textContent = name ? ("✓ " + name) : "✓ Cover geladen — bitte Titel pruefen";
     // Best-effort: Genre (und Titel falls leer) aus den Steam-Details holen, falls Steam mitspielt
     enhanceFromDetails(appId, !name);
+  }
+
+  function coverFallback(img) {
+    const wrap = img.closest(".card-cover");
+    if (wrap) { wrap.classList.add("ph"); wrap.innerHTML = '<span class="ph-dino">🦕</span>'; }
+  }
+  function previewFallback(img) {
+    const wrap = img.closest(".steam-preview");
+    if (wrap) { wrap.classList.add("ph"); wrap.innerHTML = '<span class="ph-dino">🦕</span>'; }
   }
 
   async function enhanceFromDetails(appId, fillTitle) {
@@ -330,12 +349,12 @@
     if (!r) return;
     hideSuggestions();
     document.getElementById("input-search").value = r.name;
-    setSteamGame(r.id, r.name);
+    setSteamGame(r.id, r.name, r.image);
   }
 
   function loadFromSearch() {
     const appId = extractAppId(document.getElementById("input-search").value);
-    if (appId) setSteamGame(appId, null);
+    if (appId) setSteamGame(appId, null, null);
   }
 
   function openModal() {
