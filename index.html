@@ -6,12 +6,7 @@
   <title>JollyJacky – Game Wishlist 🦕</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      min-height: 100vh;
-      background: linear-gradient(160deg, #fff0f5 0%, #fce4ec 40%, #f3e5f5 100%);
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      color: #4a1942;
-    }
+    body { min-height: 100vh; background: linear-gradient(160deg, #fff0f5 0%, #fce4ec 40%, #f3e5f5 100%); font-family: 'Segoe UI', system-ui, sans-serif; color: #4a1942; }
     header { text-align: center; padding: 28px 20px 16px; border-bottom: 2px dashed #f48fb1; }
     header .sub { font-size: 13px; font-weight: 700; color: #f06292; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
     header h1 { font-size: 28px; font-weight: 900; color: #c2185b; }
@@ -37,7 +32,7 @@
 
     .game-list { padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 10px; }
     .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; }
-    .card-cover { display: block; width: 100%; height: 120px; overflow: hidden; background: #fce4ec; }
+    .card-cover { display: block; width: 100%; aspect-ratio: 460 / 215; overflow: hidden; background: #fce4ec; }
     .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-body { padding: 14px 14px 10px; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -66,8 +61,16 @@
     .modal h2 { font-size: 20px; font-weight: 900; color: #c2185b; margin-bottom: 16px; }
     .modal label { font-size: 12px; font-weight: 700; color: #ad1457; display: block; margin-bottom: 5px; }
     .modal input, .modal select { width: 100%; border: 2px solid #f8bbd0; border-radius: 12px; padding: 12px; font-size: 14px; color: #880e4f; background: #fff; margin-bottom: 10px; outline: none; font-family: inherit; }
-    .steam-btn { width: 100%; background: #fff; border: 2px solid #f48fb1; color: #c2185b; border-radius: 12px; padding: 11px; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 8px; font-family: inherit; }
-    .steam-btn:disabled { opacity: 0.6; cursor: default; }
+
+    .search-wrap { position: relative; }
+    .search-suggestions { display: none; position: absolute; top: calc(100% - 6px); left: 0; right: 0; background: #fff; border: 2px solid #f8bbd0; border-radius: 12px; max-height: 260px; overflow-y: auto; z-index: 10; box-shadow: 0 6px 20px #f4849033; }
+    .sugg { display: flex; align-items: center; gap: 10px; padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #fce4ec; }
+    .sugg:last-child { border-bottom: none; }
+    .sugg:active, .sugg:hover { background: #fce4ec; }
+    .sugg img { width: 54px; height: 25px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background: #fce4ec; }
+    .sugg span { font-size: 13px; font-weight: 600; color: #880e4f; }
+    .sugg-msg { padding: 12px; font-size: 13px; color: #ad1457; font-weight: 600; text-align: center; }
+
     .steam-status { font-size: 12px; font-weight: 700; margin: 0 0 10px; min-height: 16px; }
     .steam-status.ok { color: #2e7d32; }
     .steam-status.error { color: #c62828; }
@@ -75,6 +78,7 @@
     .steam-preview img { width: 100%; display: block; }
     .divider { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; color: #f48fb1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .divider::before, .divider::after { content: ""; flex: 1; height: 2px; background: #fce4ec; border-radius: 2px; }
+
     .modal-submit { width: 100%; background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 4px; }
     .modal-cancel { width: 100%; background: none; border: none; color: #f48fb1; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 8px; padding: 8px; }
 
@@ -91,15 +95,9 @@
 </header>
 
 <div class="stats">
-  <div class="stat" id="stat-wished" onclick="toggleStatusFilter('wished')">
-    <div class="icon">🌸</div><div class="num" id="count-wished">0</div><div class="label">Gewünscht</div>
-  </div>
-  <div class="stat" id="stat-planned" onclick="toggleStatusFilter('planned')">
-    <div class="icon">💜</div><div class="num" id="count-planned">0</div><div class="label">Geplant</div>
-  </div>
-  <div class="stat" id="stat-played" onclick="toggleStatusFilter('played')">
-    <div class="icon">✅</div><div class="num" id="count-played">0</div><div class="label">Gespielt</div>
-  </div>
+  <div class="stat" id="stat-wished" onclick="toggleStatusFilter('wished')"><div class="icon">🌸</div><div class="num" id="count-wished">0</div><div class="label">Gewünscht</div></div>
+  <div class="stat" id="stat-planned" onclick="toggleStatusFilter('planned')"><div class="icon">💜</div><div class="num" id="count-planned">0</div><div class="label">Geplant</div></div>
+  <div class="stat" id="stat-played" onclick="toggleStatusFilter('played')"><div class="icon">✅</div><div class="num" id="count-played">0</div><div class="label">Gespielt</div></div>
 </div>
 
 <div class="controls">
@@ -116,24 +114,25 @@
 
 <button class="add-btn" onclick="openModal()">🎀 Spiel vorschlagen</button>
 
-<div class="game-list" id="game-list">
-  <div class="loading">🦕 Lade Wunschliste...</div>
-</div>
+<div class="game-list" id="game-list"><div class="loading">🦕 Lade Wunschliste...</div></div>
 
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <h2>🎀 Spiel vorschlagen</h2>
 
-    <label>Steam-Link (empfohlen 🎮)</label>
-    <input type="text" id="input-steam" placeholder="https://store.steampowered.com/app/..." />
-    <button class="steam-btn" id="steam-btn" onclick="loadFromSteam()">🔍 Von Steam laden</button>
+    <label>Spiel suchen oder Steam-Link einfügen 🎮</label>
+    <div class="search-wrap">
+      <input type="text" id="input-search" placeholder="z.B. Baldur's Gate ..." autocomplete="off"
+        oninput="onSearchInput()" onblur="setTimeout(hideSuggestions, 200)" />
+      <div class="search-suggestions" id="search-suggestions"></div>
+    </div>
     <div class="steam-status" id="steam-status"></div>
     <div class="steam-preview" id="steam-preview"></div>
 
-    <div class="divider">oder manuell</div>
+    <div class="divider">Titel &amp; Genre</div>
 
     <label>Spieltitel *</label>
-    <input type="text" id="input-title" placeholder="z.B. Baldur's Gate 3" />
+    <input type="text" id="input-title" placeholder="Wird automatisch ausgefüllt" />
     <label>Genre</label>
     <select id="input-genre">
       <option>Action</option><option>Adventure</option><option>RPG</option>
@@ -159,6 +158,8 @@
   let sortBy = "votes";
   let pendingCover = "";
   let pendingSteamUrl = "";
+  let searchTimer = null;
+  let lastResults = [];
 
   async function api(params) {
     const url = SCRIPT_URL + "?" + new URLSearchParams(params).toString();
@@ -182,15 +183,12 @@
   function buildGenreFilters() {
     const genres = ["Alle", ...new Set(games.map(g => g.genre).filter(Boolean))].sort((a,b) => a === "Alle" ? -1 : b === "Alle" ? 1 : a.localeCompare(b));
     const container = document.getElementById("genre-filters");
-    container.innerHTML = genres.map(g =>
-      `<button class="chip ${g === filterGenre ? 'active' : ''}" onclick="setGenre('${escAttr(g)}')">${escHtml(g)}</button>`
-    ).join("");
+    container.innerHTML = genres.map(g => `<button class="chip ${g === filterGenre ? 'active' : ''}" onclick="setGenre('${escAttr(g)}')">${escHtml(g)}</button>`).join("");
   }
 
   function render() {
     updateStats();
     const list = document.getElementById("game-list");
-
     let filtered = games
       .filter(g => filterStatus === "all" || g.status === filterStatus)
       .filter(g => filterGenre === "Alle" || g.genre === filterGenre)
@@ -214,9 +212,7 @@
             <div class="card-title">${escHtml(g.title)}</div>
             <span class="badge badge-${g.status}">${statusLabels[g.status] || g.status}</span>
           </div>
-          <div class="card-meta">
-            ${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}
-          </div>
+          <div class="card-meta">${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}</div>
         </div>
         <div class="card-footer">
           <button class="vote-btn ${voted[g.id] ? 'voted' : ''}" onclick="vote('${escAttr(g.id)}')" ${voted[g.id] ? 'disabled' : ''}>
@@ -232,19 +228,11 @@
     document.getElementById("count-wished").textContent = games.filter(g => g.status === "wished").length;
     document.getElementById("count-planned").textContent = games.filter(g => g.status === "planned").length;
     document.getElementById("count-played").textContent = games.filter(g => g.status === "played").length;
-    ["wished","planned","played"].forEach(s => {
-      document.getElementById("stat-"+s).classList.toggle("active", filterStatus === s);
-    });
+    ["wished","planned","played"].forEach(s => document.getElementById("stat-"+s).classList.toggle("active", filterStatus === s));
   }
 
   function toggleStatusFilter(s) { filterStatus = filterStatus === s ? "all" : s; render(); }
-
-  function setGenre(g) {
-    filterGenre = g;
-    document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.textContent === g));
-    render();
-  }
-
+  function setGenre(g) { filterGenre = g; document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.textContent === g)); render(); }
   function setSort(v) { sortBy = v; render(); }
 
   async function vote(id) {
@@ -257,7 +245,7 @@
     try { await api({ action: "vote", id }); } catch(e) {}
   }
 
-  // ---- Steam-Integration ----
+  // ---- Suche / Autocomplete ----
   function extractAppId(url) {
     const m = String(url).match(/app\/(\d+)/);
     if (m) return m[1];
@@ -266,25 +254,64 @@
     return null;
   }
 
-  async function loadFromSteam() {
-    const url = document.getElementById("input-steam").value.trim();
-    const status = document.getElementById("steam-status");
-    if (!url) { return; }
-    const appId = extractAppId(url);
-    if (!appId) {
-      status.className = "steam-status error";
-      status.textContent = "❌ Kein gültiger Steam-Link";
+  function onSearchInput() {
+    const val = document.getElementById("input-search").value.trim();
+    // Sieht aus wie ein Link/Nummer? Dann direkt laden statt Autocomplete.
+    if (val.match(/store\.steampowered|app\/\d+/) || /^\d{3,}$/.test(val)) {
+      hideSuggestions();
+      loadFromSearch();
       return;
     }
-    const btn = document.getElementById("steam-btn");
-    btn.disabled = true;
-    btn.textContent = "Lädt... 🦕";
+    clearTimeout(searchTimer);
+    if (val.length < 2) { hideSuggestions(); return; }
+    searchTimer = setTimeout(() => doSearch(val), 350);
+  }
+
+  async function doSearch(term) {
+    const box = document.getElementById("search-suggestions");
+    box.innerHTML = '<div class="sugg-msg">Suche... 🦕</div>';
+    box.style.display = "block";
+    try {
+      const data = await api({ action: "steamSearch", term });
+      if (data.ok && data.results && data.results.length) {
+        lastResults = data.results;
+        box.innerHTML = data.results.map((r,i) =>
+          `<div class="sugg" onclick="pickSuggestion(${i})">
+            ${r.image ? `<img src="${escAttr(r.image)}" alt="">` : ''}
+            <span>${escHtml(r.name)}</span>
+          </div>`).join("");
+      } else {
+        box.innerHTML = '<div class="sugg-msg">Nichts gefunden — Titel unten manuell eingeben</div>';
+      }
+    } catch(e) {
+      hideSuggestions();
+    }
+  }
+
+  function hideSuggestions() { document.getElementById("search-suggestions").style.display = "none"; }
+
+  async function pickSuggestion(i) {
+    const r = lastResults[i];
+    if (!r) return;
+    hideSuggestions();
+    document.getElementById("input-search").value = r.name;
+    document.getElementById("input-title").value = r.name;
+    await loadDetails(r.id);
+  }
+
+  function loadFromSearch() {
+    const appId = extractAppId(document.getElementById("input-search").value);
+    if (appId) loadDetails(appId);
+  }
+
+  async function loadDetails(appId) {
+    const status = document.getElementById("steam-status");
     status.className = "steam-status";
-    status.textContent = "";
+    status.textContent = "Lade Details... 🦕";
     try {
       const data = await api({ action: "steamInfo", appId });
       if (data.ok) {
-        document.getElementById("input-title").value = data.title || "";
+        if (data.title) document.getElementById("input-title").value = data.title;
         pendingCover = data.cover || "";
         pendingSteamUrl = "https://store.steampowered.com/app/" + appId + "/";
         if (data.genre) {
@@ -300,26 +327,24 @@
         status.textContent = "✓ Gefunden: " + (data.title || "");
       } else {
         status.className = "steam-status error";
-        status.textContent = "❌ " + (data.error || "Spiel nicht gefunden — bitte manuell eingeben");
+        status.textContent = "❌ " + (data.error || "Nicht gefunden — bitte manuell eingeben");
       }
     } catch(e) {
       status.className = "steam-status error";
       status.textContent = "❌ Fehler beim Laden — bitte manuell eingeben";
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "🔍 Von Steam laden";
     }
   }
 
   function openModal() {
-    document.getElementById("input-steam").value = "";
+    document.getElementById("input-search").value = "";
     document.getElementById("input-title").value = "";
     document.getElementById("input-genre").value = "Action";
-    document.getElementById("steam-status").textContent = "";
-    document.getElementById("steam-status").className = "steam-status";
+    const status = document.getElementById("steam-status");
+    status.textContent = ""; status.className = "steam-status";
     const prev = document.getElementById("steam-preview");
     prev.style.display = "none"; prev.innerHTML = "";
-    pendingCover = ""; pendingSteamUrl = "";
+    hideSuggestions();
+    pendingCover = ""; pendingSteamUrl = ""; lastResults = [];
     document.getElementById("modal-overlay").classList.add("open");
   }
   function closeModal() { document.getElementById("modal-overlay").classList.remove("open"); }
@@ -334,11 +359,7 @@
     try {
       const genre = document.getElementById("input-genre").value;
       const data = await api({ action: "addGame", title, genre, cover: pendingCover, steamUrl: pendingSteamUrl });
-      if (data.ok) {
-        closeModal();
-        showToast("🎀 Spiel vorgeschlagen!");
-        await loadGames();
-      }
+      if (data.ok) { closeModal(); showToast("🎀 Spiel vorgeschlagen!"); await loadGames(); }
     } catch(e) {
       showToast("❌ Fehler beim Eintragen");
     } finally {
@@ -352,13 +373,14 @@
 
   function showToast(msg) {
     const t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
+    t.textContent = msg; t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2500);
   }
 
-  // Auto-laden beim Einfügen eines Links
-  document.getElementById("input-steam").addEventListener("paste", () => setTimeout(loadFromSteam, 150));
+  document.getElementById("input-search").addEventListener("paste", () => setTimeout(() => {
+    const v = document.getElementById("input-search").value.trim();
+    if (extractAppId(v)) { hideSuggestions(); loadFromSearch(); }
+  }, 150));
 
   loadGames();
 </script>
