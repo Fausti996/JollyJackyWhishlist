@@ -46,6 +46,7 @@
     .badge-played { background: #ede7f6; color: #4a148c; border: 1.5px solid #b39ddb; }
     .card-meta { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .genre-badge { font-size: 11px; background: #fce4ec; color: #ad1457; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
+    .played-badge { font-size: 11px; background: #f3e5f5; color: #7b1fa2; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
     .card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec; }
     .vote-btn { display: flex; align-items: center; gap: 7px; background: #fff; border: 2px solid #f8bbd0; color: #e91e63; border-radius: 12px; padding: 7px 16px; cursor: pointer; font-weight: 800; font-size: 14px; transition: all 0.15s; }
     .vote-btn.voted { background: linear-gradient(135deg, #f48fb1, #ce93d8); border-color: #f06292; color: #fff; }
@@ -236,7 +237,10 @@
             <div class="card-title">${escHtml(g.title)}</div>
             <span class="badge badge-${g.status}">${statusLabels[g.status] || g.status}</span>
           </div>
-          <div class="card-meta">${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}</div>
+          <div class="card-meta">
+            ${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}
+            ${Number(g.timesPlayed||0)>0 ? `<span class="played-badge">🎮 ${g.timesPlayed}x gespielt</span>` : ""}
+          </div>
         </div>
         <div class="card-footer">
           <button class="vote-btn ${voted[g.id] ? 'voted' : ''}" onclick="vote('${escAttr(g.id)}')" ${voted[g.id] ? 'disabled' : ''}>
