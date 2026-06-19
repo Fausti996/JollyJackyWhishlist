@@ -12,21 +12,13 @@
       font-family: 'Segoe UI', system-ui, sans-serif;
       color: #4a1942;
     }
-    header {
-      text-align: center;
-      padding: 28px 20px 16px;
-      border-bottom: 2px dashed #f48fb1;
-    }
+    header { text-align: center; padding: 28px 20px 16px; border-bottom: 2px dashed #f48fb1; }
     header .sub { font-size: 13px; font-weight: 700; color: #f06292; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px; }
     header h1 { font-size: 28px; font-weight: 900; color: #c2185b; }
     header p { font-size: 13px; color: #e91e6399; margin-top: 6px; }
 
     .stats { display: flex; margin: 14px 16px 0; gap: 8px; }
-    .stat {
-      flex: 1; text-align: center; background: #fff;
-      border: 2px solid #fce4ec; border-radius: 14px;
-      padding: 10px 4px; cursor: pointer; transition: all 0.15s;
-    }
+    .stat { flex: 1; text-align: center; background: #fff; border: 2px solid #fce4ec; border-radius: 14px; padding: 10px 4px; cursor: pointer; transition: all 0.15s; }
     .stat.active { background: #f8bbd0; border-color: #f48fb1; }
     .stat .icon { font-size: 18px; }
     .stat .num { font-size: 20px; font-weight: 900; color: #c2185b; }
@@ -34,32 +26,19 @@
 
     .controls { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
     .genres { display: flex; gap: 6px; flex-wrap: wrap; }
-    .chip {
-      padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 700;
-      cursor: pointer; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; transition: all 0.15s;
-    }
+    .chip { padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; transition: all 0.15s; }
     .chip.active { background: #f48fb1; border-color: #e91e63; color: #fff; }
 
     .sort-row { display: flex; align-items: center; gap: 8px; }
     .sort-row span { font-size: 12px; color: #ad1457; font-weight: 600; white-space: nowrap; }
-    select {
-      background: #fff; border: 2px solid #f8bbd0; color: #c2185b;
-      border-radius: 10px; padding: 5px 10px; font-size: 13px; font-weight: 600; flex: 1;
-    }
+    select { background: #fff; border: 2px solid #f8bbd0; color: #c2185b; border-radius: 10px; padding: 5px 10px; font-size: 13px; font-weight: 600; flex: 1; font-family: inherit; }
 
-    .add-btn {
-      margin: 12px 16px 0; width: calc(100% - 32px);
-      background: linear-gradient(135deg, #f06292, #ce93d8);
-      color: #fff; border: none; border-radius: 14px; padding: 14px;
-      font-weight: 800; font-size: 15px; cursor: pointer;
-      box-shadow: 0 4px 15px #f4849055;
-    }
+    .add-btn { margin: 12px 16px 0; width: calc(100% - 32px); background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px #f4849055; }
 
     .game-list { padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 10px; }
-    .card {
-      background: #fff; border-radius: 16px; border: 2px solid #fce4ec;
-      overflow: hidden; box-shadow: 0 2px 12px #f4849018;
-    }
+    .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; }
+    .card-cover { display: block; width: 100%; height: 120px; overflow: hidden; background: #fce4ec; }
+    .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-body { padding: 14px 14px 10px; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card-title { font-size: 15px; font-weight: 800; color: #880e4f; line-height: 1.2; flex: 1; }
@@ -69,20 +48,9 @@
     .badge-played { background: #ede7f6; color: #4a148c; border: 1.5px solid #b39ddb; }
     .card-meta { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .genre-badge { font-size: 11px; background: #fce4ec; color: #ad1457; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
-    .card-footer {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec;
-    }
-    .vote-btn {
-      display: flex; align-items: center; gap: 7px;
-      background: #fff; border: 2px solid #f8bbd0; color: #e91e63;
-      border-radius: 12px; padding: 7px 16px; cursor: pointer;
-      font-weight: 800; font-size: 14px; transition: all 0.15s;
-    }
-    .vote-btn.voted {
-      background: linear-gradient(135deg, #f48fb1, #ce93d8);
-      border-color: #f06292; color: #fff;
-    }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec; }
+    .vote-btn { display: flex; align-items: center; gap: 7px; background: #fff; border: 2px solid #f8bbd0; color: #e91e63; border-radius: 12px; padding: 7px 16px; cursor: pointer; font-weight: 800; font-size: 14px; transition: all 0.15s; }
+    .vote-btn.voted { background: linear-gradient(135deg, #f48fb1, #ce93d8); border-color: #f06292; color: #fff; }
     .vote-btn .count { font-size: 18px; color: #c2185b; }
     .vote-btn.voted .count { color: #fff; }
     .vote-btn .vote-label { font-size: 12px; opacity: 0.85; }
@@ -92,40 +60,25 @@
     .empty p { font-weight: 700; margin-top: 8px; }
     .loading { text-align: center; padding: 60px 20px; color: #f48fb1; font-weight: 700; }
 
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(194,24,91,0.15); backdrop-filter: blur(4px);
-      align-items: flex-end; z-index: 100;
-    }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(194,24,91,0.15); backdrop-filter: blur(4px); align-items: flex-end; z-index: 100; }
     .modal-overlay.open { display: flex; }
-    .modal {
-      background: #fff9fb; border-radius: 20px 20px 0 0;
-      padding: 24px 20px 44px; width: 100%; max-width: 480px;
-      margin: 0 auto; border-top: 3px solid #f48fb1;
-    }
-    .modal h2 { font-size: 20px; font-weight: 900; color: #c2185b; margin-bottom: 18px; }
-    .modal input, .modal select {
-      width: 100%; border: 2px solid #f8bbd0; border-radius: 12px;
-      padding: 12px; font-size: 14px; color: #880e4f; background: #fff;
-      margin-bottom: 10px; outline: none; font-family: inherit;
-    }
-    .modal-submit {
-      width: 100%; background: linear-gradient(135deg, #f06292, #ce93d8);
-      color: #fff; border: none; border-radius: 14px; padding: 14px;
-      font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 4px;
-    }
-    .modal-cancel {
-      width: 100%; background: none; border: none; color: #f48fb1;
-      font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 8px; padding: 8px;
-    }
+    .modal { background: #fff9fb; border-radius: 20px 20px 0 0; padding: 24px 20px 44px; width: 100%; max-width: 480px; margin: 0 auto; border-top: 3px solid #f48fb1; max-height: 92vh; overflow-y: auto; }
+    .modal h2 { font-size: 20px; font-weight: 900; color: #c2185b; margin-bottom: 16px; }
+    .modal label { font-size: 12px; font-weight: 700; color: #ad1457; display: block; margin-bottom: 5px; }
+    .modal input, .modal select { width: 100%; border: 2px solid #f8bbd0; border-radius: 12px; padding: 12px; font-size: 14px; color: #880e4f; background: #fff; margin-bottom: 10px; outline: none; font-family: inherit; }
+    .steam-btn { width: 100%; background: #fff; border: 2px solid #f48fb1; color: #c2185b; border-radius: 12px; padding: 11px; font-weight: 800; font-size: 13px; cursor: pointer; margin-bottom: 8px; font-family: inherit; }
+    .steam-btn:disabled { opacity: 0.6; cursor: default; }
+    .steam-status { font-size: 12px; font-weight: 700; margin: 0 0 10px; min-height: 16px; }
+    .steam-status.ok { color: #2e7d32; }
+    .steam-status.error { color: #c62828; }
+    .steam-preview { display: none; margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 2px solid #f8bbd0; }
+    .steam-preview img { width: 100%; display: block; }
+    .divider { display: flex; align-items: center; gap: 10px; margin: 6px 0 14px; color: #f48fb1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+    .divider::before, .divider::after { content: ""; flex: 1; height: 2px; background: #fce4ec; border-radius: 2px; }
+    .modal-submit { width: 100%; background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; margin-top: 4px; }
+    .modal-cancel { width: 100%; background: none; border: none; color: #f48fb1; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 8px; padding: 8px; }
 
-    .toast {
-      display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, #f06292, #ce93d8);
-      color: #fff; padding: 11px 24px; border-radius: 24px;
-      font-weight: 800; font-size: 14px; z-index: 200;
-      box-shadow: 0 4px 20px #f4849055; white-space: nowrap;
-    }
+    .toast { display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; padding: 11px 24px; border-radius: 24px; font-weight: 800; font-size: 14px; z-index: 200; box-shadow: 0 4px 20px #f4849055; white-space: nowrap; }
     .toast.show { display: block; }
   </style>
 </head>
@@ -139,19 +92,13 @@
 
 <div class="stats">
   <div class="stat" id="stat-wished" onclick="toggleStatusFilter('wished')">
-    <div class="icon">🌸</div>
-    <div class="num" id="count-wished">0</div>
-    <div class="label">Gewünscht</div>
+    <div class="icon">🌸</div><div class="num" id="count-wished">0</div><div class="label">Gewünscht</div>
   </div>
   <div class="stat" id="stat-planned" onclick="toggleStatusFilter('planned')">
-    <div class="icon">💜</div>
-    <div class="num" id="count-planned">0</div>
-    <div class="label">Geplant</div>
+    <div class="icon">💜</div><div class="num" id="count-planned">0</div><div class="label">Geplant</div>
   </div>
   <div class="stat" id="stat-played" onclick="toggleStatusFilter('played')">
-    <div class="icon">✅</div>
-    <div class="num" id="count-played">0</div>
-    <div class="label">Gespielt</div>
+    <div class="icon">✅</div><div class="num" id="count-played">0</div><div class="label">Gespielt</div>
   </div>
 </div>
 
@@ -176,12 +123,25 @@
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <h2>🎀 Spiel vorschlagen</h2>
-    <input type="text" id="input-title" placeholder="Spieltitel *" />
+
+    <label>Steam-Link (empfohlen 🎮)</label>
+    <input type="text" id="input-steam" placeholder="https://store.steampowered.com/app/..." />
+    <button class="steam-btn" id="steam-btn" onclick="loadFromSteam()">🔍 Von Steam laden</button>
+    <div class="steam-status" id="steam-status"></div>
+    <div class="steam-preview" id="steam-preview"></div>
+
+    <div class="divider">oder manuell</div>
+
+    <label>Spieltitel *</label>
+    <input type="text" id="input-title" placeholder="z.B. Baldur's Gate 3" />
+    <label>Genre</label>
     <select id="input-genre">
-      <option>Horror</option><option>RPG</option><option>Simulation</option>
-      <option>Roguelike</option><option>Survival</option><option>Strategy</option>
-      <option>Adventure</option><option>Indie</option>
+      <option>Action</option><option>Adventure</option><option>RPG</option>
+      <option>Strategy</option><option>Simulation</option><option>Indie</option>
+      <option>Horror</option><option>Survival</option><option>Casual</option>
+      <option>Sonstiges</option>
     </select>
+
     <button class="modal-submit" id="submit-btn" onclick="submitGame()">Vorschlagen 🦕</button>
     <button class="modal-cancel" onclick="closeModal()">Abbrechen</button>
   </div>
@@ -197,6 +157,8 @@
   let filterStatus = "all";
   let filterGenre = "Alle";
   let sortBy = "votes";
+  let pendingCover = "";
+  let pendingSteamUrl = "";
 
   async function api(params) {
     const url = SCRIPT_URL + "?" + new URLSearchParams(params).toString();
@@ -218,10 +180,10 @@
   }
 
   function buildGenreFilters() {
-    const genres = ["Alle", ...new Set(games.map(g => g.genre).filter(Boolean))].sort((a,b) => a === "Alle" ? -1 : a.localeCompare(b));
+    const genres = ["Alle", ...new Set(games.map(g => g.genre).filter(Boolean))].sort((a,b) => a === "Alle" ? -1 : b === "Alle" ? 1 : a.localeCompare(b));
     const container = document.getElementById("genre-filters");
     container.innerHTML = genres.map(g =>
-      `<button class="chip ${g === filterGenre ? 'active' : ''}" onclick="setGenre('${g}')">${g}</button>`
+      `<button class="chip ${g === filterGenre ? 'active' : ''}" onclick="setGenre('${escAttr(g)}')">${escHtml(g)}</button>`
     ).join("");
   }
 
@@ -246,6 +208,7 @@
     const statusLabels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
     list.innerHTML = filtered.map(g => `
       <div class="card">
+        ${g.cover ? `<a class="card-cover" href="${escAttr(g.steamUrl || '#')}" target="_blank" rel="noopener"><img src="${escAttr(g.cover)}" alt="" loading="lazy"></a>` : ""}
         <div class="card-body">
           <div class="card-top">
             <div class="card-title">${escHtml(g.title)}</div>
@@ -256,7 +219,7 @@
           </div>
         </div>
         <div class="card-footer">
-          <button class="vote-btn ${voted[g.id] ? 'voted' : ''}" onclick="vote('${g.id}')" ${voted[g.id] ? 'disabled' : ''}>
+          <button class="vote-btn ${voted[g.id] ? 'voted' : ''}" onclick="vote('${escAttr(g.id)}')" ${voted[g.id] ? 'disabled' : ''}>
             🌸 <span class="count">${g.votes}</span>
             <span class="vote-label">${voted[g.id] ? 'Gevoted!' : 'Upvote'}</span>
           </button>
@@ -274,10 +237,7 @@
     });
   }
 
-  function toggleStatusFilter(s) {
-    filterStatus = filterStatus === s ? "all" : s;
-    render();
-  }
+  function toggleStatusFilter(s) { filterStatus = filterStatus === s ? "all" : s; render(); }
 
   function setGenre(g) {
     filterGenre = g;
@@ -297,22 +257,85 @@
     try { await api({ action: "vote", id }); } catch(e) {}
   }
 
-  function openModal() { document.getElementById("modal-overlay").classList.add("open"); }
+  // ---- Steam-Integration ----
+  function extractAppId(url) {
+    const m = String(url).match(/app\/(\d+)/);
+    if (m) return m[1];
+    const t = String(url).trim();
+    if (/^\d{3,}$/.test(t)) return t;
+    return null;
+  }
+
+  async function loadFromSteam() {
+    const url = document.getElementById("input-steam").value.trim();
+    const status = document.getElementById("steam-status");
+    if (!url) { return; }
+    const appId = extractAppId(url);
+    if (!appId) {
+      status.className = "steam-status error";
+      status.textContent = "❌ Kein gültiger Steam-Link";
+      return;
+    }
+    const btn = document.getElementById("steam-btn");
+    btn.disabled = true;
+    btn.textContent = "Lädt... 🦕";
+    status.className = "steam-status";
+    status.textContent = "";
+    try {
+      const data = await api({ action: "steamInfo", appId });
+      if (data.ok) {
+        document.getElementById("input-title").value = data.title || "";
+        pendingCover = data.cover || "";
+        pendingSteamUrl = "https://store.steampowered.com/app/" + appId + "/";
+        if (data.genre) {
+          const sel = document.getElementById("input-genre");
+          let found = false;
+          for (const opt of sel.options) { if (opt.value === data.genre) { found = true; break; } }
+          if (!found) { const o = document.createElement("option"); o.value = data.genre; o.textContent = data.genre; sel.appendChild(o); }
+          sel.value = data.genre;
+        }
+        const prev = document.getElementById("steam-preview");
+        if (pendingCover) { prev.innerHTML = '<img src="' + escAttr(pendingCover) + '" alt="">'; prev.style.display = "block"; }
+        status.className = "steam-status ok";
+        status.textContent = "✓ Gefunden: " + (data.title || "");
+      } else {
+        status.className = "steam-status error";
+        status.textContent = "❌ " + (data.error || "Spiel nicht gefunden — bitte manuell eingeben");
+      }
+    } catch(e) {
+      status.className = "steam-status error";
+      status.textContent = "❌ Fehler beim Laden — bitte manuell eingeben";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "🔍 Von Steam laden";
+    }
+  }
+
+  function openModal() {
+    document.getElementById("input-steam").value = "";
+    document.getElementById("input-title").value = "";
+    document.getElementById("input-genre").value = "Action";
+    document.getElementById("steam-status").textContent = "";
+    document.getElementById("steam-status").className = "steam-status";
+    const prev = document.getElementById("steam-preview");
+    prev.style.display = "none"; prev.innerHTML = "";
+    pendingCover = ""; pendingSteamUrl = "";
+    document.getElementById("modal-overlay").classList.add("open");
+  }
   function closeModal() { document.getElementById("modal-overlay").classList.remove("open"); }
   function handleOverlayClick(e) { if (e.target === e.currentTarget) closeModal(); }
 
   async function submitGame() {
     const title = document.getElementById("input-title").value.trim();
-    if (!title) return;
+    if (!title) { showToast("❌ Bitte einen Titel angeben"); return; }
     const btn = document.getElementById("submit-btn");
     btn.textContent = "Wird eingetragen... 🦕";
     btn.disabled = true;
     try {
       const genre = document.getElementById("input-genre").value;
-      const data = await api({ action: "addGame", title, genre, tag: "" });
+      const data = await api({ action: "addGame", title, genre, cover: pendingCover, steamUrl: pendingSteamUrl });
       if (data.ok) {
         closeModal();
-        document.getElementById("input-title").value = "";
         showToast("🎀 Spiel vorgeschlagen!");
         await loadGames();
       }
@@ -324,9 +347,8 @@
     }
   }
 
-  function escHtml(str) {
-    return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  }
+  function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function escAttr(str) { return String(str).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   function showToast(msg) {
     const t = document.getElementById("toast");
@@ -334,6 +356,9 @@
     t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2500);
   }
+
+  // Auto-laden beim Einfügen eines Links
+  document.getElementById("input-steam").addEventListener("paste", () => setTimeout(loadFromSteam, 150));
 
   loadGames();
 </script>
