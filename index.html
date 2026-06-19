@@ -33,12 +33,13 @@
     .stat .label { font-size: 10px; color: #ad1457; font-weight: 600; }
 
     .controls { padding: 12px 16px 0; display: flex; flex-direction: column; gap: 10px; }
-    .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+    .genres { display: flex; gap: 6px; flex-wrap: wrap; }
     .chip {
       padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 700;
       cursor: pointer; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; transition: all 0.15s;
     }
     .chip.active { background: #f48fb1; border-color: #e91e63; color: #fff; }
+
     .sort-row { display: flex; align-items: center; gap: 8px; }
     .sort-row span { font-size: 12px; color: #ad1457; font-weight: 600; white-space: nowrap; }
     select {
@@ -62,15 +63,12 @@
     .card-body { padding: 14px 14px 10px; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card-title { font-size: 15px; font-weight: 800; color: #880e4f; line-height: 1.2; flex: 1; }
-    .badge {
-      font-size: 11px; font-weight: 700; border-radius: 8px; padding: 3px 8px; white-space: nowrap;
-    }
+    .badge { font-size: 11px; font-weight: 700; border-radius: 8px; padding: 3px 8px; white-space: nowrap; }
     .badge-wished { background: #fce4ec; color: #c2185b; border: 1.5px solid #f48fb1; }
     .badge-planned { background: #fce4ec; color: #7b1fa2; border: 1.5px solid #ce93d8; }
     .badge-played { background: #ede7f6; color: #4a148c; border: 1.5px solid #b39ddb; }
     .card-meta { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .genre-badge { font-size: 11px; background: #fce4ec; color: #ad1457; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
-    .tag-badge { font-size: 11px; background: #f3e5f5; color: #7b1fa2; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
     .card-footer {
       display: flex; justify-content: space-between; align-items: center;
       padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec;
@@ -92,10 +90,8 @@
     .empty { text-align: center; padding: 60px 20px; color: #f48fb1; }
     .empty .dino { font-size: 40px; }
     .empty p { font-weight: 700; margin-top: 8px; }
+    .loading { text-align: center; padding: 60px 20px; color: #f48fb1; font-weight: 700; }
 
-    .loading { text-align: center; padding: 60px 20px; color: #f48fb1; }
-
-    /* Modal */
     .modal-overlay {
       display: none; position: fixed; inset: 0;
       background: rgba(194,24,91,0.15); backdrop-filter: blur(4px);
@@ -123,7 +119,6 @@
       font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 8px; padding: 8px;
     }
 
-    /* Toast */
     .toast {
       display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(135deg, #f06292, #ce93d8);
@@ -161,14 +156,7 @@
 </div>
 
 <div class="controls">
-  <div class="tags" id="tag-filters">
-    <button class="chip active" onclick="setTag('Alle')">Alle</button>
-    <button class="chip" onclick="setTag('Montag')">Montag</button>
-    <button class="chip" onclick="setTag('Dienstag')">Dienstag</button>
-    <button class="chip" onclick="setTag('Freitag')">Freitag</button>
-    <button class="chip" onclick="setTag('Samstag')">Samstag</button>
-    <button class="chip" onclick="setTag('Sonntag')">Sonntag</button>
-  </div>
+  <div class="genres" id="genre-filters"></div>
   <div class="sort-row">
     <span>Sortierung:</span>
     <select onchange="setSort(this.value)">
@@ -185,7 +173,6 @@
   <div class="loading">🦕 Lade Wunschliste...</div>
 </div>
 
-<!-- Modal -->
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
     <h2>🎀 Spiel vorschlagen</h2>
@@ -194,10 +181,6 @@
       <option>Horror</option><option>RPG</option><option>Simulation</option>
       <option>Roguelike</option><option>Survival</option><option>Strategy</option>
       <option>Adventure</option><option>Indie</option>
-    </select>
-    <select id="input-tag">
-      <option>Montag</option><option>Dienstag</option><option>Freitag</option>
-      <option>Samstag</option><option>Sonntag</option>
     </select>
     <button class="modal-submit" id="submit-btn" onclick="submitGame()">Vorschlagen 🦕</button>
     <button class="modal-cancel" onclick="closeModal()">Abbrechen</button>
@@ -212,7 +195,7 @@
   let games = [];
   let voted = JSON.parse(localStorage.getItem("voted") || "{}");
   let filterStatus = "all";
-  let filterTag = "Alle";
+  let filterGenre = "Alle";
   let sortBy = "votes";
 
   async function api(params) {
@@ -226,11 +209,20 @@
       const data = await api({ action: "getGames" });
       if (data.ok) {
         games = data.games.map(g => ({ ...g, votes: Number(g.votes), id: String(g.id) }));
+        buildGenreFilters();
         render();
       }
     } catch(e) {
       document.getElementById("game-list").innerHTML = '<div class="empty"><div class="dino">😕</div><p>Verbindungsfehler</p></div>';
     }
+  }
+
+  function buildGenreFilters() {
+    const genres = ["Alle", ...new Set(games.map(g => g.genre).filter(Boolean))].sort((a,b) => a === "Alle" ? -1 : a.localeCompare(b));
+    const container = document.getElementById("genre-filters");
+    container.innerHTML = genres.map(g =>
+      `<button class="chip ${g === filterGenre ? 'active' : ''}" onclick="setGenre('${g}')">${g}</button>`
+    ).join("");
   }
 
   function render() {
@@ -239,7 +231,7 @@
 
     let filtered = games
       .filter(g => filterStatus === "all" || g.status === filterStatus)
-      .filter(g => filterTag === "Alle" || g.tag === filterTag)
+      .filter(g => filterGenre === "Alle" || g.genre === filterGenre)
       .sort((a, b) => {
         if (sortBy === "votes") return b.votes - a.votes;
         if (sortBy === "newest") return String(b.id).localeCompare(String(a.id));
@@ -261,7 +253,6 @@
           </div>
           <div class="card-meta">
             ${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}
-            ${g.tag ? `<span class="tag-badge">📅 ${escHtml(g.tag)}</span>` : ""}
           </div>
         </div>
         <div class="card-footer">
@@ -288,9 +279,9 @@
     render();
   }
 
-  function setTag(t) {
-    filterTag = t;
-    document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.textContent === t));
+  function setGenre(g) {
+    filterGenre = g;
+    document.querySelectorAll(".chip").forEach(c => c.classList.toggle("active", c.textContent === g));
     render();
   }
 
@@ -318,8 +309,7 @@
     btn.disabled = true;
     try {
       const genre = document.getElementById("input-genre").value;
-      const tag = document.getElementById("input-tag").value;
-      const data = await api({ action: "addGame", title, genre, tag });
+      const data = await api({ action: "addGame", title, genre, tag: "" });
       if (data.ok) {
         closeModal();
         document.getElementById("input-title").value = "";
