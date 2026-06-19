@@ -10,7 +10,6 @@
     header { text-align: center; padding: 26px 20px 14px; border-bottom: 2px dashed #f48fb1; }
     header .sub { font-size: 13px; font-weight: 700; color: #f06292; letter-spacing: 2px; text-transform: uppercase; }
     header h1 { font-size: 25px; font-weight: 900; color: #c2185b; margin-top: 2px; }
-    header p { font-size: 13px; color: #e91e6399; margin-top: 6px; }
 
     .wrap { padding: 16px; max-width: 560px; margin: 0 auto; }
 
@@ -18,43 +17,79 @@
     .login { background: #fff; border: 2px solid #fce4ec; border-radius: 16px; padding: 22px 18px; box-shadow: 0 2px 12px #f4849018; }
     .login label { font-size: 12px; font-weight: 700; color: #ad1457; display: block; margin-bottom: 6px; }
     .login input { width: 100%; border: 2px solid #f8bbd0; border-radius: 12px; padding: 12px; font-size: 14px; color: #880e4f; background: #fff; outline: none; font-family: inherit; margin-bottom: 12px; }
-    .btn-primary { width: 100%; background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 13px; font-weight: 800; font-size: 15px; cursor: pointer; }
+    .btn-primary { width: 100%; background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 13px; font-weight: 800; font-size: 15px; cursor: pointer; font-family: inherit; }
     .btn-primary:disabled { opacity: 0.6; cursor: default; }
     .login-msg { font-size: 13px; font-weight: 700; color: #c62828; margin-top: 10px; min-height: 16px; text-align: center; }
 
-    /* Panel */
+    /* Tabs */
+    .tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .tab { flex: 1; padding: 10px; border-radius: 12px; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; font-family: inherit; transition: all 0.12s; }
+    .tab.active { background: #f48fb1; border-color: #e91e63; color: #fff; }
+
+    /* Toolbar */
     .panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .panel-head .count { font-size: 13px; color: #ad1457; font-weight: 700; }
     .toolbar { display: flex; gap: 8px; }
     .btn-sm { background: #fff; border: 2px solid #f8bbd0; color: #c2185b; border-radius: 10px; padding: 7px 12px; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
 
     .filter-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-    .chip { padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; }
+    .chip { padding: 5px 13px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid #f8bbd0; background: #fff; color: #c2185b; font-family: inherit; }
     .chip.active { background: #f48fb1; border-color: #e91e63; color: #fff; }
 
+    /* Game list */
     .list { display: flex; flex-direction: column; gap: 10px; }
     .row { background: #fff; border: 2px solid #fce4ec; border-radius: 14px; padding: 12px; box-shadow: 0 2px 12px #f4849018; }
     .row-top { display: flex; gap: 12px; align-items: center; }
-    .thumb { width: 84px; height: 39px; flex-shrink: 0; border-radius: 6px; object-fit: cover; background: linear-gradient(135deg,#fce4ec,#f3e5f5); display: flex; align-items: center; justify-content: center; }
-    .thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; display: block; }
-    .thumb .ph { font-size: 20px; opacity: 0.6; }
+    .thumb { width: 84px; height: 39px; flex-shrink: 0; border-radius: 6px; overflow: hidden; background: linear-gradient(135deg,#fce4ec,#f3e5f5); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .row-info { flex: 1; min-width: 0; }
     .row-title { font-size: 14px; font-weight: 800; color: #880e4f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .row-meta { font-size: 12px; color: #ad1457; margin-top: 2px; }
     .del { background: #fff; border: 2px solid #f8bbd0; color: #e91e63; border-radius: 10px; width: 38px; height: 38px; flex-shrink: 0; cursor: pointer; font-size: 16px; }
-    .del:hover { background: #fce4ec; }
-
     .status-row { display: flex; gap: 6px; margin-top: 10px; }
-    .status-btn { flex: 1; border: 2px solid #f8bbd0; background: #fff; border-radius: 10px; padding: 8px 4px; font-weight: 700; font-size: 12px; cursor: pointer; color: #c2185b; font-family: inherit; transition: all 0.12s; }
+    .status-btn { flex: 1; border: 2px solid #f8bbd0; background: #fff; border-radius: 10px; padding: 8px 4px; font-weight: 700; font-size: 12px; cursor: pointer; color: #c2185b; font-family: inherit; }
     .status-btn.active-wished { background: #fce4ec; border-color: #f48fb1; color: #c2185b; }
     .status-btn.active-planned { background: #f3e5f5; border-color: #ce93d8; color: #7b1fa2; }
     .status-btn.active-played { background: #ede7f6; border-color: #b39ddb; color: #4a148c; }
+    .played-btn { width: 100%; margin-top: 8px; border: 2px solid #ce93d8; background: #f3e5f5; border-radius: 10px; padding: 9px; font-weight: 800; font-size: 13px; cursor: pointer; color: #7b1fa2; font-family: inherit; transition: all 0.12s; }
+    .played-btn:hover { background: #e1bee7; }
+    .played-count { font-size: 11px; opacity: 0.75; font-weight: 600; }
+
+    /* Events */
+    .new-event { background: #fff; border: 2px solid #fce4ec; border-radius: 16px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 12px #f4849018; }
+    .new-event h3 { font-size: 15px; font-weight: 800; color: #c2185b; margin-bottom: 12px; }
+    .new-event label { font-size: 12px; font-weight: 700; color: #ad1457; display: block; margin-bottom: 5px; }
+    .new-event input { width: 100%; border: 2px solid #f8bbd0; border-radius: 12px; padding: 10px; font-size: 14px; color: #880e4f; background: #fff; outline: none; font-family: inherit; margin-bottom: 10px; }
+    .game-picker { max-height: 240px; overflow-y: auto; border: 2px solid #f8bbd0; border-radius: 12px; margin-bottom: 10px; }
+    .pick-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid #fce4ec; cursor: pointer; }
+    .pick-row:last-child { border-bottom: none; }
+    .pick-row:hover { background: #fce4ec33; }
+    .pick-row input[type=checkbox] { accent-color: #f06292; width: 16px; height: 16px; flex-shrink: 0; }
+    .pick-thumb { width: 54px; height: 25px; border-radius: 4px; overflow: hidden; background: #fce4ec; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .pick-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .pick-title { font-size: 13px; font-weight: 700; color: #880e4f; }
+    .btn-create { width: 100%; background: linear-gradient(135deg,#f06292,#ce93d8); color: #fff; border: none; border-radius: 12px; padding: 12px; font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; }
+    .btn-create:disabled { opacity: 0.6; cursor: default; }
+
+    .event-card { background: #fff; border: 2px solid #fce4ec; border-radius: 14px; padding: 14px; box-shadow: 0 2px 12px #f4849018; }
+    .event-head-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+    .event-name { font-size: 15px; font-weight: 800; color: #880e4f; }
+    .event-date { font-size: 12px; color: #ad1457; margin-top: 2px; }
+    .event-actions { display: flex; gap: 6px; }
+    .badge-open { background: #fce4ec; color: #c2185b; border: 1.5px solid #f48fb1; border-radius: 8px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
+    .badge-closed { background: #ede7f6; color: #4a148c; border: 1.5px solid #b39ddb; border-radius: 8px; padding: 2px 9px; font-size: 11px; font-weight: 700; }
+    .event-games { display: flex; flex-direction: column; gap: 5px; margin: 10px 0 12px; }
+    .ev-game { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #880e4f; padding: 5px 0; border-bottom: 1px dashed #fce4ec; }
+    .ev-game:last-child { border-bottom: none; }
+    .ev-votes { font-weight: 900; color: #f06292; font-size: 15px; }
+    .event-row-btns { display: flex; gap: 6px; }
+    .toggle-btn { flex: 1; border: 2px solid #f8bbd0; background: #fff; border-radius: 10px; padding: 8px; font-weight: 700; font-size: 12px; cursor: pointer; color: #c2185b; font-family: inherit; }
+    .vote-link { flex: 1; border: 2px solid #ce93d8; background: #f3e5f5; border-radius: 10px; padding: 8px; font-weight: 700; font-size: 12px; cursor: pointer; color: #7b1fa2; text-decoration: none; display: flex; align-items: center; justify-content: center; }
 
     .loading, .empty { text-align: center; padding: 50px 20px; color: #f48fb1; font-weight: 700; }
-    .empty .dino { font-size: 38px; }
     .hidden { display: none; }
 
-    .toast { display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; padding: 11px 24px; border-radius: 24px; font-weight: 800; font-size: 14px; z-index: 200; box-shadow: 0 4px 20px #f4849055; white-space: nowrap; }
+    .toast { display: none; position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg,#f06292,#ce93d8); color: #fff; padding: 11px 24px; border-radius: 24px; font-weight: 800; font-size: 14px; z-index: 200; box-shadow: 0 4px 20px #f4849055; white-space: nowrap; }
     .toast.show { display: block; }
   </style>
 </head>
@@ -63,11 +98,9 @@
 <header>
   <div class="sub">JollyJacky</div>
   <h1>Admin-Bereich 🎀</h1>
-  <p>Status ändern & aufräumen</p>
 </header>
 
 <div class="wrap">
-
   <!-- Login -->
   <div class="login" id="login">
     <label>Admin-Passwort</label>
@@ -78,34 +111,61 @@
 
   <!-- Panel -->
   <div id="panel" class="hidden">
-    <div class="panel-head">
-      <span class="count" id="game-count"></span>
-      <div class="toolbar">
-        <button class="btn-sm" onclick="loadGames()">🔄 Neu laden</button>
-        <button class="btn-sm" onclick="logout()">Abmelden</button>
+    <div class="tabs">
+      <button class="tab active" id="tab-games" onclick="switchTab('games')">🎮 Spiele</button>
+      <button class="tab" id="tab-events" onclick="switchTab('events')">🗳️ Events</button>
+    </div>
+
+    <!-- Games tab -->
+    <div id="view-games">
+      <div class="panel-head">
+        <span class="count" id="game-count"></span>
+        <div class="toolbar">
+          <button class="btn-sm" onclick="loadGames()">🔄</button>
+          <button class="btn-sm" onclick="logout()">Abmelden</button>
+        </div>
       </div>
+      <div class="filter-row">
+        <button class="chip active" onclick="setFilter('all',this)">Alle</button>
+        <button class="chip" onclick="setFilter('wished',this)">Gewünscht</button>
+        <button class="chip" onclick="setFilter('planned',this)">Geplant</button>
+        <button class="chip" onclick="setFilter('played',this)">Gespielt</button>
+      </div>
+      <div class="list" id="list"><div class="loading">🦕 Lade...</div></div>
     </div>
 
-    <div class="filter-row" id="filter-row">
-      <button class="chip active" onclick="setFilter('all')">Alle</button>
-      <button class="chip" onclick="setFilter('wished')">Gewünscht</button>
-      <button class="chip" onclick="setFilter('planned')">Geplant</button>
-      <button class="chip" onclick="setFilter('played')">Gespielt</button>
-    </div>
+    <!-- Events tab -->
+    <div id="view-events" class="hidden">
+      <div class="panel-head">
+        <span class="count" id="event-count"></span>
+        <div class="toolbar">
+          <button class="btn-sm" onclick="loadEvents()">🔄</button>
+        </div>
+      </div>
 
-    <div class="list" id="list"><div class="loading">🦕 Lade...</div></div>
+      <!-- New event form -->
+      <div class="new-event">
+        <h3>🗳️ Neues Event erstellen</h3>
+        <label>Name *</label>
+        <input type="text" id="ev-name" placeholder='z.B. "Horror-Samstag"' />
+        <label>Datum (optional)</label>
+        <input type="text" id="ev-date" placeholder="z.B. 28.06.2026" />
+        <label>Spiele zur Auswahl (mindestens 2)</label>
+        <div class="game-picker" id="game-picker"><div class="loading">🦕 Lade...</div></div>
+        <button class="btn-create" id="create-btn" onclick="createEvent()">Event erstellen 🦕</button>
+      </div>
+
+      <div class="list" id="event-list"><div class="loading">🦕 Lade...</div></div>
+    </div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5bJuYmzrBdZqvDLF5x6Xym6MchIpVFtwrHjbBI0PIHdbuq1hOVM_jcXRy1zkCW7OW/exec";
-
   let pw = sessionStorage.getItem("adminpw") || "";
-  let games = [];
-  let filter = "all";
+  let games = [], events = [], filter = "all", activeTab = "games";
 
   async function api(params) {
     const url = SCRIPT_URL + "?" + new URLSearchParams(params).toString();
@@ -122,23 +182,15 @@
     try {
       const data = await api({ action: "checkPw", pw: val });
       if (data.ok) {
-        pw = val;
-        sessionStorage.setItem("adminpw", pw);
-        showPanel();
-        loadGames();
-      } else {
-        msg.textContent = "❌ Falsches Passwort";
-      }
-    } catch(e) {
-      msg.textContent = "❌ Verbindungsfehler";
-    } finally {
-      btn.disabled = false; btn.textContent = "Anmelden 🦕";
-    }
+        pw = val; sessionStorage.setItem("adminpw", pw);
+        showPanel(); loadGames(); loadEvents();
+      } else { msg.textContent = "❌ Falsches Passwort"; }
+    } catch(e) { msg.textContent = "❌ Verbindungsfehler"; }
+    finally { btn.disabled = false; btn.textContent = "Anmelden 🦕"; }
   }
 
   function logout() {
-    pw = "";
-    sessionStorage.removeItem("adminpw");
+    pw = ""; sessionStorage.removeItem("adminpw");
     document.getElementById("panel").classList.add("hidden");
     document.getElementById("login").classList.remove("hidden");
     document.getElementById("pw-input").value = "";
@@ -149,102 +201,199 @@
     document.getElementById("panel").classList.remove("hidden");
   }
 
+  function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById("view-games").classList.toggle("hidden", tab !== "games");
+    document.getElementById("view-events").classList.toggle("hidden", tab !== "events");
+    document.getElementById("tab-games").classList.toggle("active", tab === "games");
+    document.getElementById("tab-events").classList.toggle("active", tab === "events");
+  }
+
+  // ---- Games ----
   async function loadGames() {
     document.getElementById("list").innerHTML = '<div class="loading">🦕 Lade...</div>';
     try {
       const data = await api({ action: "getGames" });
-      if (data.ok) {
-        games = data.games.map(g => ({ ...g, votes: Number(g.votes), id: String(g.id) }));
-        render();
-      }
-    } catch(e) {
-      document.getElementById("list").innerHTML = '<div class="empty"><div class="dino">😕</div>Verbindungsfehler</div>';
-    }
+      if (data.ok) { games = data.games.map(g => ({...g, votes: Number(g.votes), id: String(g.id)})); renderGames(); buildPicker(); }
+    } catch(e) { document.getElementById("list").innerHTML = '<div class="empty">😕 Verbindungsfehler</div>'; }
   }
 
-  function setFilter(f) {
+  function setFilter(f, el) {
     filter = f;
     document.querySelectorAll(".filter-row .chip").forEach(c => c.classList.remove("active"));
-    event.target.classList.add("active");
-    render();
+    el.classList.add("active");
+    renderGames();
   }
 
-  function render() {
+  function renderGames() {
     const labels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
-    const filtered = games
-      .filter(g => filter === "all" || g.status === filter)
-      .sort((a,b) => b.votes - a.votes);
-
+    const filtered = games.filter(g => filter === "all" || g.status === filter).sort((a,b) => b.votes - a.votes);
     document.getElementById("game-count").textContent = filtered.length + " Spiel(e)";
     const list = document.getElementById("list");
-
-    if (filtered.length === 0) {
-      list.innerHTML = '<div class="empty"><div class="dino">🦕</div>Keine Spiele</div>';
-      return;
-    }
-
+    if (!filtered.length) { list.innerHTML = '<div class="empty">🦕 Keine Spiele</div>'; return; }
     list.innerHTML = filtered.map(g => `
       <div class="row">
         <div class="row-top">
-          <div class="thumb">${g.cover ? `<img src="${escAttr(g.cover)}" alt="" onerror="this.parentNode.innerHTML='<span class=\\'ph\\'>🦕</span>'">` : `<span class="ph">🦕</span>`}</div>
+          <div class="thumb">${g.cover ? `<img src="${ea(g.cover)}" alt="" onerror="this.parentNode.innerHTML='🦕'">` : '🦕'}</div>
           <div class="row-info">
-            <div class="row-title">${escHtml(g.title)}</div>
-            <div class="row-meta">🌸 ${g.votes} Votes · ${g.genre ? escHtml(g.genre) : "—"}</div>
+            <div class="row-title">${eh(g.title)}</div>
+            <div class="row-meta">🌸 ${g.votes} · ${g.genre ? eh(g.genre) : '—'}</div>
           </div>
-          <button class="del" onclick="del('${escAttr(g.id)}', '${escAttr(g.title)}')" title="Löschen">🗑️</button>
+          <button class="del" onclick="del('${ea(g.id)}','${ea(g.title)}')">🗑️</button>
         </div>
         <div class="status-row">
-          <button class="status-btn ${g.status === 'wished' ? 'active-wished' : ''}" onclick="setStatus('${escAttr(g.id)}','wished')">🌸 Gewünscht</button>
-          <button class="status-btn ${g.status === 'planned' ? 'active-planned' : ''}" onclick="setStatus('${escAttr(g.id)}','planned')">💜 Geplant</button>
-          <button class="status-btn ${g.status === 'played' ? 'active-played' : ''}" onclick="setStatus('${escAttr(g.id)}','played')">✅ Gespielt</button>
+          <button class="status-btn ${g.status==='wished'?'active-wished':''}" onclick="setStatus('${ea(g.id)}','wished')">🌸 Gewünscht</button>
+          <button class="status-btn ${g.status==='planned'?'active-planned':''}" onclick="setStatus('${ea(g.id)}','planned')">💜 Geplant</button>
         </div>
-      </div>
-    `).join("");
+        <button class="played-btn" onclick="markPlayed('${ea(g.id)}','${ea(g.title)}')">
+          🎮 Als gespielt markieren
+          ${Number(g.timesPlayed||0)>0?`<span class="played-count">(${g.timesPlayed}x gespielt)</span>`:''}
+        </button>
+      </div>`).join("");
   }
 
   async function setStatus(id, status) {
-    const game = games.find(g => g.id === id);
-    if (!game || game.status === status) return;
-    const prev = game.status;
-    game.status = status;          // optimistisch
-    render();
-    showToast("✓ Status geändert");
+    const game = games.find(g => g.id === id); if (!game || game.status === status) return;
+    const prev = game.status; game.status = status; renderGames(); showToast("✓ Status geändert");
     try {
       const data = await api({ action: "setStatus", id, status, pw });
-      if (!data.ok) { game.status = prev; render(); showToast("❌ " + (data.error || "Fehler")); }
-    } catch(e) {
-      game.status = prev; render(); showToast("❌ Verbindungsfehler");
-    }
+      if (!data.ok) { game.status = prev; renderGames(); showToast("❌ " + (data.error || "Fehler")); }
+    } catch(e) { game.status = prev; renderGames(); showToast("❌ Verbindungsfehler"); }
   }
 
   async function del(id, title) {
     if (!confirm('"' + title + '" wirklich löschen?')) return;
     const idx = games.findIndex(g => g.id === id);
     const backup = games[idx];
-    games = games.filter(g => g.id !== id);   // optimistisch
-    render();
+    games = games.filter(g => g.id !== id); renderGames();
     try {
       const data = await api({ action: "deleteGame", id, pw });
-      if (!data.ok) { games.splice(idx, 0, backup); render(); showToast("❌ " + (data.error || "Fehler")); }
-      else showToast("🗑️ Gelöscht");
-    } catch(e) {
-      games.splice(idx, 0, backup); render(); showToast("❌ Verbindungsfehler");
-    }
+      if (!data.ok) { games.splice(idx, 0, backup); renderGames(); showToast("❌ " + (data.error || "Fehler")); }
+      else { showToast("🗑️ Gelöscht"); buildPicker(); }
+    } catch(e) { games.splice(idx, 0, backup); renderGames(); showToast("❌ Verbindungsfehler"); }
   }
 
-  function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function escAttr(str) { return String(str).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"\\'").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  // ---- Events ----
+  function buildPicker() {
+    const wished = games.filter(g => g.status !== "played").sort((a,b) => b.votes - a.votes);
+    const picker = document.getElementById("game-picker");
+    if (!wished.length) { picker.innerHTML = '<div class="loading" style="padding:12px">Keine Spiele</div>'; return; }
+    picker.innerHTML = wished.map(g => `
+      <label class="pick-row">
+        <input type="checkbox" class="game-pick" value="${ea(g.id)}" />
+        <div class="pick-thumb">${g.cover ? `<img src="${ea(g.cover)}" alt="" onerror="this.parentNode.innerHTML='🦕'">` : '🦕'}</div>
+        <span class="pick-title">${eh(g.title)}</span>
+      </label>`).join("");
+  }
+
+  async function loadEvents() {
+    document.getElementById("event-list").innerHTML = '<div class="loading">🦕 Lade...</div>';
+    try {
+      const data = await api({ action: "getEvents" });
+      if (data.ok) { events = data.events; renderEvents(); }
+    } catch(e) { document.getElementById("event-list").innerHTML = '<div class="empty">😕 Verbindungsfehler</div>'; }
+  }
+
+  function renderEvents() {
+    const el = document.getElementById("event-list");
+    document.getElementById("event-count").textContent = events.length + " Event(s)";
+    if (!events.length) { el.innerHTML = '<div class="empty">🦕 Noch keine Events</div>'; return; }
+    const sorted = [...events].sort((a,b) => Number(b.id) - Number(a.id));
+    el.innerHTML = sorted.map(ev => {
+      const totalVotes = ev.games.reduce((s,g) => s + (ev.votes[g.id]||0), 0);
+      const isOpen = ev.status === "open";
+      return `
+        <div class="event-card">
+          <div class="event-head-row">
+            <div>
+              <div class="event-name">${eh(ev.name)}</div>
+              ${ev.date ? `<div class="event-date">📅 ${eh(ev.date)}</div>` : ''}
+            </div>
+            <span class="${isOpen ? 'badge-open' : 'badge-closed'}">${isOpen ? '🟢 Offen' : '🔒 Beendet'}</span>
+          </div>
+          <div class="event-games">
+            ${ev.games.map(g => {
+              const v = ev.votes[g.id]||0;
+              const pct = totalVotes ? Math.round(v/totalVotes*100) : 0;
+              return `<div class="ev-game"><span>${eh(g.title)}</span><span class="ev-votes">${v} 🌸 (${pct}%)</span></div>`;
+            }).join("")}
+          </div>
+          <div style="font-size:12px;color:#ad1457;margin-bottom:10px;">Gesamt: ${totalVotes} Stimme${totalVotes!==1?'n':''}</div>
+          <div class="event-row-btns">
+            <button class="toggle-btn" onclick="toggleEvent('${ea(ev.id)}','${isOpen?'closed':'open'}')">${isOpen ? '🔒 Beenden' : '🟢 Wieder öffnen'}</button>
+            <a class="vote-link" href="vote.html" target="_blank">🔗 Vote-Link</a>
+            <button class="del" onclick="delEvent('${ea(ev.id)}','${ea(ev.name)}')">🗑️</button>
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  async function createEvent() {
+    const name = document.getElementById("ev-name").value.trim();
+    const date = document.getElementById("ev-date").value.trim();
+    const checked = [...document.querySelectorAll(".game-pick:checked")].map(c => c.value);
+    if (!name) { showToast("❌ Bitte einen Namen eingeben"); return; }
+    if (checked.length < 2) { showToast("❌ Mindestens 2 Spiele auswählen"); return; }
+    const btn = document.getElementById("create-btn");
+    btn.disabled = true; btn.textContent = "Erstelle... 🦕";
+    try {
+      const data = await api({ action: "createEvent", name, date, gameIds: checked.join(","), pw });
+      if (data.ok) {
+        document.getElementById("ev-name").value = "";
+        document.getElementById("ev-date").value = "";
+        document.querySelectorAll(".game-pick:checked").forEach(c => c.checked = false);
+        showToast("🎀 Event erstellt!");
+        loadEvents();
+      } else { showToast("❌ " + (data.error || "Fehler")); }
+    } catch(e) { showToast("❌ Verbindungsfehler"); }
+    finally { btn.disabled = false; btn.textContent = "Event erstellen 🦕"; }
+  }
+
+  async function toggleEvent(id, newStatus) {
+    try {
+      const data = await api({ action: "setEventStatus", id, status: newStatus, pw });
+      if (data.ok) { showToast(newStatus === "closed" ? "🔒 Event beendet" : "🟢 Event geöffnet"); loadEvents(); }
+      else { showToast("❌ " + (data.error || "Fehler")); }
+    } catch(e) { showToast("❌ Verbindungsfehler"); }
+  }
+
+  async function delEvent(id, name) {
+    if (!confirm('"' + name + '" wirklich löschen?')) return;
+    try {
+      const data = await api({ action: "deleteEvent", id, pw });
+      if (data.ok) { showToast("🗑️ Event gelöscht"); loadEvents(); }
+      else { showToast("❌ " + (data.error || "Fehler")); }
+    } catch(e) { showToast("❌ Verbindungsfehler"); }
+  }
+
+  async function markPlayed(id, title) {
+    if (!confirm('"' + title + '" als gespielt markieren?\nZähler +1, Status zurück auf Gewünscht.')) return;
+    const game = games.find(g => g.id === id); if (!game) return;
+    const prevStatus = game.status;
+    const prevTimes = Number(game.timesPlayed||0);
+    game.status = "wished";
+    game.timesPlayed = prevTimes + 1;
+    renderGames();
+    showToast("🎮 Als gespielt markiert!");
+    try {
+      const data = await api({ action: "markPlayed", id, pw });
+      if (!data.ok) { game.status = prevStatus; game.timesPlayed = prevTimes; renderGames(); showToast("❌ " + (data.error||"Fehler")); }
+    } catch(e) { game.status = prevStatus; game.timesPlayed = prevTimes; renderGames(); showToast("❌ Verbindungsfehler"); }
+  }
+
+  function eh(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function ea(s) { return String(s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
   function showToast(msg) {
     const t = document.getElementById("toast");
     t.textContent = msg; t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 2200);
+    setTimeout(() => t.classList.remove("show"), 2500);
   }
 
-  // Auto-Login falls Passwort aus dieser Session noch da ist
   if (pw) {
     api({ action: "checkPw", pw }).then(d => {
-      if (d.ok) { showPanel(); loadGames(); } else { sessionStorage.removeItem("adminpw"); pw=""; }
+      if (d.ok) { showPanel(); loadGames(); loadEvents(); }
+      else { sessionStorage.removeItem("adminpw"); pw = ""; }
     }).catch(()=>{});
   }
 </script>
