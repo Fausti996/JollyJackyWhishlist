@@ -30,7 +30,7 @@
 
     .add-btn { margin: 12px 16px 0; width: calc(100% - 32px); background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px #f4849055; }
 
-    .game-list { padding: 12px 16px 80px; display: flex; flex-direction: column; gap: 10px; }
+    .game-list { padding: 12px 16px 12px; display: flex; flex-direction: column; gap: 10px; }
     .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; }
     .card-cover { display: block; width: 100%; aspect-ratio: 460 / 215; overflow: hidden; background: #fce4ec; }
     .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -57,6 +57,16 @@
     .empty .dino { font-size: 40px; }
     .empty p { font-weight: 700; margin-top: 8px; }
     .loading { text-align: center; padding: 60px 20px; color: #f48fb1; font-weight: 700; }
+    .search-box { width: 100%; border: 2px solid #f8bbd0; border-radius: 12px; padding: 10px 14px; font-size: 14px; color: #880e4f; background: #fff; outline: none; font-family: inherit; }
+    .search-box::placeholder { color: #f48fb1; }
+    .steam-status.warn { color: #e65100; }
+    .stats-footer { margin: 4px 16px 40px; background: #fff; border: 2px solid #fce4ec; border-radius: 16px; padding: 16px; box-shadow: 0 2px 12px #f4849018; text-align: center; }
+    .sf-title { font-size: 13px; font-weight: 800; color: #c2185b; margin-bottom: 12px; letter-spacing: 0.5px; }
+    .sf-grid { display: flex; gap: 8px; }
+    .sf-item { flex: 1; }
+    .sf-num { font-size: 24px; font-weight: 900; color: #f06292; }
+    .sf-lbl { font-size: 11px; color: #ad1457; font-weight: 600; margin-top: 2px; }
+    .sf-top { margin-top: 14px; padding-top: 12px; border-top: 1.5px dashed #fce4ec; font-size: 13px; color: #880e4f; }
 
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(194,24,91,0.15); backdrop-filter: blur(4px); align-items: flex-end; z-index: 100; }
     .modal-overlay.open { display: flex; }
@@ -104,6 +114,7 @@
 </div>
 
 <div class="controls">
+  <input type="text" id="search-box" class="search-box" placeholder="🔍 Suchen — Titel, Genre, Status ..." oninput="setSearch(this.value)" />
   <div class="genres" id="genre-filters"></div>
   <div class="sort-row">
     <span>Sortierung:</span>
@@ -118,6 +129,7 @@
 <button class="add-btn" onclick="openModal()">🎀 Spiel vorschlagen</button>
 
 <div class="game-list" id="game-list"><div class="loading">🦕 Lade Wunschliste...</div></div>
+<div class="stats-footer" id="stats-footer"></div>
 
 <div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
   <div class="modal">
@@ -159,6 +171,7 @@
   let filterStatus = "all";
   let filterGenre = "Alle";
   let sortBy = "votes";
+  let searchQuery = "";
   let pendingCover = "";
   let pendingSteamUrl = "";
   let searchTimer = null;
@@ -191,10 +204,17 @@
 
   function render() {
     updateStats();
+    renderStats();
     const list = document.getElementById("game-list");
+    const statusLabels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
     let filtered = games
       .filter(g => filterStatus === "all" || g.status === filterStatus)
       .filter(g => filterGenre === "Alle" || g.genre === filterGenre)
+      .filter(g => {
+        if (!searchQuery) return true;
+        const hay = (g.title + " " + (g.genre || "") + " " + (statusLabels[g.status] || "")).toLowerCase();
+        return hay.includes(searchQuery);
+      })
       .sort((a, b) => {
         if (sortBy === "votes") return b.votes - a.votes;
         if (sortBy === "newest") return String(b.id).localeCompare(String(a.id));
@@ -206,7 +226,6 @@
       return;
     }
 
-    const statusLabels = { wished: "Gewünscht", planned: "Geplant", played: "Gespielt" };
     list.innerHTML = filtered.map(g => `
       <div class="card">
         ${g.steamUrl
@@ -315,6 +334,10 @@
     const status = document.getElementById("steam-status");
     status.className = "steam-status ok";
     status.textContent = name ? ("✓ " + name) : "✓ Cover geladen — bitte Titel pruefen";
+    if (name) {
+      const dup = findDuplicate(name, pendingSteamUrl);
+      if (dup) { status.className = "steam-status warn"; status.textContent = "⚠️ Schon auf der Liste — Vorschlagen zählt als Vote"; }
+    }
     // Best-effort: Genre (und Titel falls leer) aus den Steam-Details holen, falls Steam mitspielt
     enhanceFromDetails(appId, !name);
   }
@@ -375,6 +398,24 @@
   async function submitGame() {
     const title = document.getElementById("input-title").value.trim();
     if (!title) { showToast("❌ Bitte einen Titel angeben"); return; }
+
+    // Duplikat-Schutz: schon auf der Liste? -> kein Doppel, sondern Vote
+    const dup = findDuplicate(title, pendingSteamUrl);
+    if (dup) {
+      closeModal();
+      if (!voted[dup.id]) {
+        voted[dup.id] = true;
+        localStorage.setItem("voted", JSON.stringify(voted));
+        games = games.map(g => g.id === dup.id ? { ...g, votes: g.votes + 1 } : g);
+        render();
+        try { await api({ action: "vote", id: dup.id }); } catch(e) {}
+        showToast("🌸 Steht schon drin — dein Vote zählt!");
+      } else {
+        showToast("🎀 Steht schon auf der Liste!");
+      }
+      return;
+    }
+
     const btn = document.getElementById("submit-btn");
     btn.textContent = "Wird eingetragen... 🦕";
     btn.disabled = true;
@@ -392,6 +433,33 @@
 
   function escHtml(str) { return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
   function escAttr(str) { return String(str).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  function setSearch(v) { searchQuery = String(v).toLowerCase().trim(); render(); }
+
+  function renderStats() {
+    const el = document.getElementById("stats-footer");
+    if (!games.length) { el.innerHTML = ""; return; }
+    const totalVotes = games.reduce((s,g) => s + g.votes, 0);
+    const played = games.filter(g => g.status === "played").length;
+    const top = games.filter(g => g.status !== "played").sort((a,b) => b.votes - a.votes)[0];
+    el.innerHTML = `
+      <div class="sf-title">🦕 Wunschlisten-Statistik</div>
+      <div class="sf-grid">
+        <div class="sf-item"><div class="sf-num">${games.length}</div><div class="sf-lbl">Spiele</div></div>
+        <div class="sf-item"><div class="sf-num">${totalVotes}</div><div class="sf-lbl">🌸 Votes</div></div>
+        <div class="sf-item"><div class="sf-num">${played}</div><div class="sf-lbl">✅ Gespielt</div></div>
+      </div>
+      ${top ? `<div class="sf-top">👑 Top-Wunsch: <b>${escHtml(top.title)}</b> (${top.votes} 🌸)</div>` : ""}
+    `;
+  }
+
+  function appIdFromUrl(url) { const m = String(url || "").match(/app\/(\d+)/); return m ? m[1] : ""; }
+  function normTitle(t) { return String(t || "").toLowerCase().replace(/[^a-z0-9]+/g, ""); }
+  function findDuplicate(title, steamUrl) {
+    const aid = appIdFromUrl(steamUrl);
+    const nt = normTitle(title);
+    return games.find(g => (aid && appIdFromUrl(g.steamUrl) === aid) || (nt && normTitle(g.title) === nt));
+  }
 
   function showToast(msg) {
     const t = document.getElementById("toast");
