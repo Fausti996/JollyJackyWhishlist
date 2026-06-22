@@ -52,6 +52,8 @@
     .card-meta { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
     .genre-badge { font-size: 11px; background: #fce4ec; color: #ad1457; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
     .played-badge { font-size: 11px; background: #f3e5f5; color: #7b1fa2; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
+    .steam-link { font-size: 11px; background: #e3f2fd; color: #1565c0; border-radius: 6px; padding: 2px 8px; font-weight: 600; text-decoration: none; transition: background 0.15s; }
+    .steam-link:hover { background: #bbdefb; }
     .card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec; }
     .vote-btn { display: flex; align-items: center; gap: 7px; background: #fff; border: 2px solid #f8bbd0; color: #e91e63; border-radius: 12px; padding: 7px 16px; cursor: pointer; font-weight: 800; font-size: 14px; transition: all 0.15s; }
     .vote-btn.voted { background: linear-gradient(135deg, #f48fb1, #ce93d8); border-color: #f06292; color: #fff; }
@@ -247,6 +249,7 @@
           <div class="card-meta">
             ${g.genre ? `<span class="genre-badge">${escHtml(g.genre)}</span>` : ""}
             ${Number(g.timesPlayed||0)>0 ? `<span class="played-badge">🎮 ${g.timesPlayed}x gespielt</span>` : ""}
+            ${g.steamUrl ? `<a class="steam-link" href="${escAttr(g.steamUrl)}" target="_blank" rel="noopener">🔗 Steam</a>` : ""}
           </div>
         </div>
         <div class="card-footer">
