@@ -178,11 +178,9 @@
   // ====== Supabase-Konfiguration ======
 const SUPABASE_URL = "https://xwsgykzubzmkmhohlhmd.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3c2d5a3p1Ynpta21ob2hsaG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNDg1NjQsImV4cCI6MjA5NzcyNDU2NH0.inTWUbfQoMQmiq8D0YgxyLDQjUmpIfeWmM9Mj-kXXQc";
-const STEAM_PROXY_URL = ""; // <- wird im naechsten Schritt gesetzt (Supabase Edge Function)
+const STEAM_PROXY_URL = "https://xwsgykzubzmkmhohlhmd.supabase.co/functions/v1/steam-proxy";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Anonymer Voter-Key pro Browser (fuer den Doppelvote-Schutz). Mit Fallback,
-// falls localStorage blockiert ist (z.B. in einer Vorschau-Sandbox).
 function jjVoterKey() {
   try {
     var k = localStorage.getItem("jj_voter_key");
@@ -211,16 +209,15 @@ var VOTER_KEY = jjVoterKey();
 
   async function api(params) {
   var action = params.action;
+  var H = { headers: { Authorization: "Bearer " + SUPABASE_ANON_KEY, apikey: SUPABASE_ANON_KEY } };
   try {
     if (action === "getGames") {
       var r = await db.from("games").select("*");
       if (r.error) throw r.error;
       var games = (r.data || []).map(function (g) {
-        return {
-          id: String(g.id), title: g.title, genre: g.genre, tag: g.tag,
+        return { id: String(g.id), title: g.title, genre: g.genre, tag: g.tag,
           status: g.status, votes: Number(g.votes) || 0, cover: g.cover,
-          steamUrl: g.steam_url, timesPlayed: Number(g.times_played) || 0
-        };
+          steamUrl: g.steam_url, timesPlayed: Number(g.times_played) || 0 };
       });
       return { ok: true, games: games };
     }
@@ -271,12 +268,12 @@ var VOTER_KEY = jjVoterKey();
     }
     if (action === "steamSearch") {
       if (!STEAM_PROXY_URL) return { ok: true, results: [] };
-      var res = await fetch(STEAM_PROXY_URL + "?action=search&term=" + encodeURIComponent(params.term || ""));
+      var res = await fetch(STEAM_PROXY_URL + "?action=search&term=" + encodeURIComponent(params.term || ""), H);
       return await res.json();
     }
     if (action === "steamInfo") {
       if (!STEAM_PROXY_URL) return { ok: false, error: "steam_proxy_not_configured" };
-      var res2 = await fetch(STEAM_PROXY_URL + "?action=info&appId=" + encodeURIComponent(params.appId || ""));
+      var res2 = await fetch(STEAM_PROXY_URL + "?action=info&appId=" + encodeURIComponent(params.appId || ""), H);
       return await res2.json();
     }
     return { ok: false, error: "unknown_action: " + action };
@@ -579,6 +576,27 @@ var VOTER_KEY = jjVoterKey();
   }, 150));
 
   loadGames();
+
+  // ====== Live-Updates (Realtime) ======
+  db.channel("rt-wishlist")
+    .on("postgres_changes", { event: "*", schema: "public", table: "games" }, function (payload) {
+      if (payload.eventType === "DELETE") {
+        games = games.filter(function (x) { return x.id !== String(payload.old.id); });
+        render();
+      } else if (payload.eventType === "INSERT") {
+        loadGames();
+      } else {
+        var g = payload.new;
+        var i = games.findIndex(function (x) { return x.id === String(g.id); });
+        if (i >= 0) {
+          games[i].votes = Number(g.votes) || 0;
+          games[i].status = g.status;
+          games[i].timesPlayed = Number(g.times_played) || 0;
+          render();
+        } else { loadGames(); }
+      }
+    })
+    .subscribe();
 </script>
 </body>
 </html>
