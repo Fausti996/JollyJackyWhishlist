@@ -31,18 +31,18 @@
 
     .add-btn { display: block; margin: 12px auto 0; width: 100%; max-width: 640px; background: linear-gradient(135deg, #f06292, #ce93d8); color: #fff; border: none; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 15px; cursor: pointer; box-shadow: 0 4px 15px #f4849055; }
 
-    .game-list { padding: 14px 0 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start; }
+    .game-list { padding: 14px 0 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
     .game-list .empty, .game-list .loading { grid-column: 1 / -1; }
     @media (max-width: 1000px) { .game-list { grid-template-columns: repeat(3, 1fr); } }
     @media (max-width: 720px)  { .game-list { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px)  { .game-list { grid-template-columns: 1fr; } }
-    .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; }
+    .card { background: #fff; border-radius: 16px; border: 2px solid #fce4ec; overflow: hidden; box-shadow: 0 2px 12px #f4849018; display: flex; flex-direction: column; }
     .card-cover { display: block; width: 100%; aspect-ratio: 460 / 215; overflow: hidden; background: #fce4ec; }
     .card-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-cover.ph { display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #fce4ec, #f3e5f5); }
     .ph-dino { font-size: 38px; opacity: 0.65; }
     .steam-preview.ph { display: flex; align-items: center; justify-content: center; min-height: 90px; background: linear-gradient(135deg, #fce4ec, #f3e5f5); }
-    .card-body { padding: 14px 14px 10px; }
+    .card-body { padding: 14px 14px 10px; flex: 1; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
     .card-title { font-size: 15px; font-weight: 800; color: #880e4f; line-height: 1.2; flex: 1; }
     .badge { font-size: 11px; font-weight: 700; border-radius: 8px; padding: 3px 8px; white-space: nowrap; }
@@ -54,7 +54,7 @@
     .played-badge { font-size: 11px; background: #f3e5f5; color: #7b1fa2; border-radius: 6px; padding: 2px 8px; font-weight: 600; }
     .steam-link { font-size: 11px; background: #e3f2fd; color: #1565c0; border-radius: 6px; padding: 2px 8px; font-weight: 600; text-decoration: none; transition: background 0.15s; }
     .steam-link:hover { background: #bbdefb; }
-    .card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; padding: 8px 14px 12px; border-top: 1.5px dashed #fce4ec; margin-top: auto; }
     .vote-btn { display: flex; align-items: center; gap: 7px; background: #fff; border: 2px solid #f8bbd0; color: #e91e63; border-radius: 12px; padding: 7px 16px; cursor: pointer; font-weight: 800; font-size: 14px; transition: all 0.15s; }
     .vote-btn.voted { background: linear-gradient(135deg, #f48fb1, #ce93d8); border-color: #f06292; color: #fff; }
     .vote-btn .count { font-size: 18px; color: #c2185b; }
