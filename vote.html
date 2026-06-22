@@ -93,6 +93,13 @@ function api(params) {
 function eh(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function ea(s) { return String(s||"").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
 
+function fmtDate(d) {
+  if (!d) return '';
+  var p = String(d).split('-');
+  if (p.length === 3) return p[2] + '.' + p[1] + '.' + p[0];
+  return String(d);
+}
+
 function showToast(msg) {
   var t = document.getElementById("toast");
   t.textContent = msg; t.classList.add("show");
@@ -147,84 +154,87 @@ function buildEventCard(ev) {
   head.innerHTML =
     '<div class="event-name">' + eh(ev.name) + '</div>' +
     '<div class="event-meta">' +
-      (ev.date ? '📅 ' + eh(ev.date) : '') +
+      (ev.date ? '📅 ' + fmtDate(ev.date) : '') +
       '<span class="' + (isOpen ? 'badge-open' : 'badge-closed') + '">' + (isOpen ? '🟢 Abstimmung läuft' : '🔒 Beendet') + '</span>' +
     '</div>';
   card.appendChild(head);
 
-  if (showResults) {
-    // Show results view: game list + bars
-    var gamesDiv = document.createElement("div");
-    gamesDiv.className = "games";
-    ev.games.forEach(function(g) {
-      var v = Number(ev.votes[g.id])||0;
-      var row = document.createElement("div");
-      row.className = "game-row";
-      var thumbHtml = g.cover ? '<img src="' + ea(g.cover) + '" alt="" onerror="this.parentNode.innerHTML=\'🦕\'">' : '🦕';
-      row.innerHTML =
-        '<div class="gthumb">' + thumbHtml + '</div>' +
-        '<div class="ginfo">' +
-          '<div class="gtitle">' + eh(g.title) + '</div>' +
-          (g.genre ? '<span class="ggenre">' + eh(g.genre) + '</span>' : '') +
-        '</div>' +
-        '<div style="text-align:right;flex-shrink:0">' +
-          '<div style="font-size:18px;font-weight:900;color:#f06292">' + v + ' 🌸</div>' +
-        '</div>';
-      gamesDiv.appendChild(row);
-    });
-    card.appendChild(gamesDiv);
+  // Always show vote buttons + results at the same time
+  var gamesDiv = document.createElement("div");
+  gamesDiv.className = "games";
+  ev.games.forEach(function(g) {
+    var v = Number(ev.votes[g.id])||0;
+    var pct = totalVotes ? Math.round(v/totalVotes*100) : 0;
+    var myVote = voted[ev.id] === g.id;
 
-    // Bars
-    var resultWrap = document.createElement("div");
-    resultWrap.className = "result-wrap";
-    ev.games.forEach(function(g) {
-      var v = Number(ev.votes[g.id])||0;
-      var pct = totalVotes ? Math.round(v/totalVotes*100) : 0;
-      var rrow = document.createElement("div");
-      rrow.className = "result-row";
-      rrow.innerHTML =
-        '<div class="result-top"><span>' + eh(g.title) + '</span><span>' + pct + '%</span></div>' +
-        '<div class="result-bar-bg"><div class="result-bar" style="width:' + pct + '%"></div></div>';
-      resultWrap.appendChild(rrow);
-    });
-    card.appendChild(resultWrap);
+    var row = document.createElement("div");
+    row.className = "game-row";
+    row.style.flexDirection = "column";
+    row.style.alignItems = "stretch";
+    row.style.gap = "8px";
 
-    if (hasVoted) {
-      var msg = document.createElement("div");
-      msg.className = "voted-msg";
-      msg.textContent = "🎀 Du hast bereits abgestimmt!";
-      card.appendChild(msg);
-    } else {
-      var cmsg = document.createElement("div");
-      cmsg.className = "closed-msg";
-      cmsg.textContent = "🔒 Abstimmung beendet";
-      card.appendChild(cmsg);
-    }
+    var thumbHtml = g.cover ? '<img src="' + ea(g.cover) + '" alt="" onerror="this.parentNode.innerHTML=\'🦕\'">' : '🦕';
 
-  } else {
-    // Voting view: each game gets its own vote button
-    var gamesDiv = document.createElement("div");
-    gamesDiv.className = "games";
-    ev.games.forEach(function(g) {
-      var v = Number(ev.votes[g.id])||0;
-      var row = document.createElement("div");
-      row.className = "game-row";
-      var thumbHtml = g.cover ? '<img src="' + ea(g.cover) + '" alt="" onerror="this.parentNode.innerHTML=\'🦕\'">' : '🦕';
-      row.innerHTML =
-        '<div class="gthumb">' + thumbHtml + '</div>' +
-        '<div class="ginfo">' +
-          '<div class="gtitle">' + eh(g.title) + '</div>' +
-          (g.genre ? '<span class="ggenre">' + eh(g.genre) + '</span>' : '') +
-        '</div>';
+    // Top: thumb + info + button
+    var topRow = document.createElement("div");
+    topRow.style.cssText = "display:flex;align-items:center;gap:12px";
+    topRow.innerHTML =
+      '<div class="gthumb">' + thumbHtml + '</div>' +
+      '<div class="ginfo">' +
+        '<div class="gtitle">' + eh(g.title) + '</div>' +
+        (g.genre ? '<span class="ggenre">' + eh(g.genre) + '</span>' : '') +
+      '</div>';
 
+    if (isOpen && !hasVoted) {
+      // Show vote button
       var btn = document.createElement("button");
       btn.className = "vote-btn";
       btn.innerHTML = '🌸 <span class="vote-count">' + v + '</span>';
-      btn.addEventListener("click", function() { doVote(ev.id, g.id); });
-      row.appendChild(btn);
-      gamesDiv.appendChild(row);
-    });
-    card.appendChild(gamesDiv);
+      (function(evId, gId){ btn.addEventListener("click", function(){ doVote(evId, gId); }); })(ev.id, g.id);
+      topRow.appendChild(btn);
+    } else {
+      // Show vote count only
+      var countDiv = document.createElement("div");
+      countDiv.style.cssText = "text-align:right;flex-shrink:0";
+      countDiv.innerHTML = '<div style="font-size:18px;font-weight:900;color:' + (myVote?'#f06292':'#c2185b') + '">' + v + ' 🌸</div>';
+      if (myVote) {
+        var myLabel = document.createElement("div");
+        myLabel.style.cssText = "font-size:11px;color:#f06292;font-weight:700;text-align:right";
+        myLabel.textContent = "Deine Wahl";
+        countDiv.appendChild(myLabel);
+      }
+      topRow.appendChild(countDiv);
+    }
+    row.appendChild(topRow);
+
+    // Bar (always shown)
+    var barWrap = document.createElement("div");
+    barWrap.className = "result-bar-bg";
+    var bar = document.createElement("div");
+    bar.className = "result-bar";
+    bar.style.cssText = "width:" + pct + "%;background:" + (myVote ? "linear-gradient(90deg,#c2185b,#f06292)" : "linear-gradient(90deg,#f06292,#ce93d8)");
+    barWrap.appendChild(bar);
+
+    var barLabel = document.createElement("div");
+    barLabel.style.cssText = "font-size:11px;color:#ad1457;font-weight:600;text-align:right";
+    barLabel.textContent = pct + "%";
+
+    row.appendChild(barWrap);
+    row.appendChild(barLabel);
+    gamesDiv.appendChild(row);
+  });
+  card.appendChild(gamesDiv);
+
+  if (hasVoted) {
+    var msg = document.createElement("div");
+    msg.className = "voted-msg";
+    msg.textContent = "🎀 Du hast bereits abgestimmt!";
+    card.appendChild(msg);
+  } else if (!isOpen) {
+    var cmsg = document.createElement("div");
+    cmsg.className = "closed-msg";
+    cmsg.textContent = "🔒 Abstimmung beendet";
+    card.appendChild(cmsg);
   }
 
   return card;
