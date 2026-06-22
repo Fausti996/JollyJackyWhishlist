@@ -133,8 +133,8 @@
         <h3>🗳️ Neues Event erstellen</h3>
         <label>Name *</label>
         <input type="text" id="ev-name" placeholder='z.B. Horror-Samstag' />
-        <label>Datum (optional)</label>
-        <input type="text" id="ev-date" placeholder="z.B. 28.06.2026" />
+        <label>Datum *</label>
+        <input type="date" id="ev-date" required />
         <label>Spiele zur Auswahl (mind. 2 anhaken)</label>
         <div class="game-picker" id="game-picker"><div class="loading">🦕 Lade...</div></div>
         <button class="btn-create" id="create-event-btn">Event erstellen 🦕</button>
@@ -160,6 +160,13 @@ function api(params) {
 
 function eh(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function ea(s) { return String(s||"").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+
+function fmtDate(d) {
+  if (!d) return '';
+  var p = String(d).split('-');
+  if (p.length === 3) return p[2] + '.' + p[1] + '.' + p[0];
+  return String(d);
+}
 
 function showToast(msg) {
   var t = document.getElementById("toast");
@@ -362,7 +369,7 @@ function renderEvents() {
     card.innerHTML =
       '<div class="event-top">' +
         '<div><div class="event-name">' + eh(ev.name) + '</div>' +
-        (ev.date ? '<div class="event-date">📅 ' + eh(ev.date) + '</div>' : '') + '</div>' +
+        (ev.date ? '<div class="event-date">📅 ' + fmtDate(ev.date) + '</div>' : '') + '</div>' +
         '<span class="' + (isOpen?'badge-open':'badge-closed') + '">' + (isOpen?'🟢 Offen':'🔒 Beendet') + '</span>' +
       '</div>' +
       '<div class="ev-games">' + gamesHtml + '</div>' +
@@ -389,6 +396,7 @@ function doSubmitEvent() {
   var date = document.getElementById("ev-date").value.trim();
   var checked = Array.from(document.querySelectorAll(".game-pick:checked")).map(function(c){ return c.value; });
   if (!name) { showToast("❌ Bitte einen Namen eingeben"); return; }
+  if (!date) { showToast("❌ Bitte ein Datum auswählen"); return; }
   if (checked.length < 2) { showToast("❌ Mindestens 2 Spiele auswählen"); return; }
   var btn = document.getElementById("create-event-btn");
   btn.disabled = true; btn.textContent = "Erstelle... 🦕";
