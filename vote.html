@@ -80,14 +80,107 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz5bJuYmzrBdZqvDLF5x6Xym6MchIpVFtwrHjbBI0PIHdbuq1hOVM_jcXRy1zkCW7OW/exec";
+// ====== Supabase-Konfiguration ======
+const SUPABASE_URL = "https://xwsgykzubzmkmhohlhmd.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3c2d5a3p1Ynpta21ob2hsaG1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNDg1NjQsImV4cCI6MjA5NzcyNDU2NH0.inTWUbfQoMQmiq8D0YgxyLDQjUmpIfeWmM9Mj-kXXQc";
+const STEAM_PROXY_URL = ""; // <- wird im naechsten Schritt gesetzt (Supabase Edge Function)
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Anonymer Voter-Key pro Browser (fuer den Doppelvote-Schutz). Mit Fallback,
+// falls localStorage blockiert ist (z.B. in einer Vorschau-Sandbox).
+function jjVoterKey() {
+  try {
+    var k = localStorage.getItem("jj_voter_key");
+    if (!k) {
+      k = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("k" + Date.now() + "_" + Math.random());
+      localStorage.setItem("jj_voter_key", k);
+    }
+    return k;
+  } catch (e) {
+    if (!window.__jjvk) window.__jjvk = "k" + Date.now() + "_" + Math.random();
+    return window.__jjvk;
+  }
+}
+var VOTER_KEY = jjVoterKey();
 var voted = JSON.parse(localStorage.getItem("event_voted") || "{}");
 var eventsData = [];
 
-function api(params) {
-  var url = SCRIPT_URL + "?" + new URLSearchParams(params).toString();
-  return fetch(url).then(function(r){ return r.json(); });
+async function api(params) {
+  var action = params.action;
+  try {
+    if (action === "getGames") {
+      var r = await db.from("games").select("*");
+      if (r.error) throw r.error;
+      var games = (r.data || []).map(function (g) {
+        return {
+          id: String(g.id), title: g.title, genre: g.genre, tag: g.tag,
+          status: g.status, votes: Number(g.votes) || 0, cover: g.cover,
+          steamUrl: g.steam_url, timesPlayed: Number(g.times_played) || 0
+        };
+      });
+      return { ok: true, games: games };
+    }
+    if (action === "addGame") {
+      var r = await db.rpc("add_game", { p_title: params.title || "", p_genre: params.genre || "", p_tag: params.tag || "", p_cover: params.cover || "", p_steam_url: params.steamUrl || "" });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "vote") {
+      var r = await db.rpc("vote_game", { p_game_id: Number(params.id), p_voter_key: VOTER_KEY });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "checkPw") {
+      var r = await db.rpc("check_admin", { p_password: params.pw || "" });
+      if (r.error) throw r.error; return { ok: !!r.data };
+    }
+    if (action === "setStatus") {
+      var r = await db.rpc("admin_set_status", { p_password: params.pw || "", p_id: Number(params.id), p_status: params.status });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "markPlayed") {
+      var r = await db.rpc("admin_mark_played", { p_password: params.pw || "", p_id: Number(params.id) });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "deleteGame") {
+      var r = await db.rpc("admin_delete_game", { p_password: params.pw || "", p_id: Number(params.id) });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "getEvents") {
+      var r = await db.rpc("get_events");
+      if (r.error) throw r.error; return { ok: true, events: r.data || [] };
+    }
+    if (action === "createEvent") {
+      var ids = String(params.gameIds || "").split(",").filter(Boolean).map(Number);
+      var r = await db.rpc("admin_create_event", { p_password: params.pw || "", p_name: params.name || "", p_date: params.date || "", p_game_ids: ids });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "setEventStatus") {
+      var r = await db.rpc("admin_set_event_status", { p_password: params.pw || "", p_id: Number(params.id), p_status: params.status });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "deleteEvent") {
+      var r = await db.rpc("admin_delete_event", { p_password: params.pw || "", p_id: Number(params.id) });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "eventVote") {
+      var r = await db.rpc("event_vote", { p_event_id: Number(params.eventId), p_game_id: Number(params.gameId), p_voter_key: VOTER_KEY });
+      if (r.error) throw r.error; return r.data;
+    }
+    if (action === "steamSearch") {
+      if (!STEAM_PROXY_URL) return { ok: true, results: [] };
+      var res = await fetch(STEAM_PROXY_URL + "?action=search&term=" + encodeURIComponent(params.term || ""));
+      return await res.json();
+    }
+    if (action === "steamInfo") {
+      if (!STEAM_PROXY_URL) return { ok: false, error: "steam_proxy_not_configured" };
+      var res2 = await fetch(STEAM_PROXY_URL + "?action=info&appId=" + encodeURIComponent(params.appId || ""));
+      return await res2.json();
+    }
+    return { ok: false, error: "unknown_action: " + action };
+  } catch (e) {
+    return { ok: false, error: (e && e.message) ? e.message : String(e) };
+  }
 }
 
 function eh(s) { return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
